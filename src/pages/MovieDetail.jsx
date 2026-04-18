@@ -26,6 +26,26 @@ const MovieDetail = () => {
     fetchMovie();
   }, [id]);
 
+  const formatEmbedUrl = (url) => {
+    if (!url) return '';
+    let formatted = url;
+
+    // Convert YouTube links to embed format
+    if (formatted.includes('youtube.com/watch?v=')) {
+      formatted = formatted.replace('watch?v=', 'embed/');
+    } else if (formatted.includes('youtu.be/')) {
+      const id = formatted.split('/').pop();
+      formatted = `https://www.youtube.com/embed/${id}`;
+    }
+
+    // Ensure StreamWish/SeekStreaming use the embed path
+    if (formatted.includes('streamwish.to/') && !formatted.includes('/e/')) {
+      formatted = formatted.replace('streamwish.to/', 'streamwish.to/e/');
+    }
+
+    return formatted;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-brand-bg">
@@ -75,14 +95,14 @@ const MovieDetail = () => {
               <div className="relative w-full aspect-video bg-black rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group">
                 {movie.videoUrl ? (
                   <iframe
-                    src={movie.videoUrl}
+                    src={formatEmbedUrl(movie.videoUrl)}
                     className="absolute inset-0 w-full h-full"
                     allowFullScreen
-                    allow="autoplay; encrypted-media"
+                    allow="autoplay; encrypted-media; picture-in-picture"
                     frameBorder="0"
                     title={movie.title}
                     referrerPolicy="no-referrer"
-                    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts"
+                    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-presentation allow-popups"
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-brand-text/30 font-bold uppercase tracking-widest bg-brand-card/20">
