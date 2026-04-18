@@ -81,6 +81,8 @@ const MovieDetail = () => {
                     allow="autoplay; encrypted-media"
                     frameBorder="0"
                     title={movie.title}
+                    referrerPolicy="no-referrer"
+                    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts"
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-brand-text/30 font-bold uppercase tracking-widest bg-brand-card/20">
