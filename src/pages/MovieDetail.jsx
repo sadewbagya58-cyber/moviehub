@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Star, ArrowLeft, Download, ShieldCheck, Cpu, ExternalLink } from 'lucide-react';
-import ReactPlayer from 'react-player';
+
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -104,22 +104,14 @@ const MovieDetail = () => {
                 style={{ paddingBottom: '56.25%', height: 0 }}
               >
                 {movie.videoUrl ? (
-                  <ReactPlayer
-                    url={movie.videoUrl}
-                    width="100%"
-                    height="100%"
-                    controls
-                    style={{ position: 'absolute', top: 0, left: 0 }}
-                    config={{
-                      youtube: {
-                        playerVars: { modestbranding: 1, rel: 0 },
-                      },
-                      file: {
-                        attributes: {
-                          controlsList: 'nodownload',
-                        },
-                      },
-                    }}
+                  <iframe
+                    src={formatEmbedUrl(movie.videoUrl)}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                    allowFullScreen
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    title="Movie Player"
+                    referrerPolicy="no-referrer"
+                    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-presentation allow-popups"
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-brand-text/30 font-bold uppercase tracking-widest bg-brand-card/20">
