@@ -97,11 +97,11 @@ const MovieDetail = () => {
           <div className="lg:col-span-8 space-y-10">
             {/* 16:9 Iframe Container */}
             <div className="flex flex-col gap-6 md:gap-8 w-full">
-              <div className="relative w-full h-0 pb-[56.25%] bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group block">
+              <div className="relative w-full aspect-video min-h-[210px] sm:min-h-[300px] md:min-h-[450px] bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group flex items-center justify-center">
                 {movie.videoUrl ? (
                   <iframe
                     src={formatEmbedUrl(movie.videoUrl)}
-                    className="absolute top-0 left-0 w-full h-full"
+                    className="absolute inset-0 w-full h-full object-cover"
                     allowFullScreen
                     allow="autoplay; encrypted-media; picture-in-picture"
                     frameBorder="0"
@@ -110,7 +110,7 @@ const MovieDetail = () => {
                     sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-presentation allow-popups"
                   />
                 ) : (
-                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-brand-text/30 font-bold uppercase tracking-widest bg-brand-card/20">
+                  <div className="absolute inset-0 flex items-center justify-center text-brand-text/30 font-bold uppercase tracking-widest bg-brand-card/20">
                     Streaming link currently unavailable
                   </div>
                 )}
