@@ -4,7 +4,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Star, ArrowLeft, Download, ShieldCheck, Cpu, ExternalLink } from 'lucide-react';
 
-
+// Build-ID: 102 — forced fresh deploy
 const MovieDetail = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
