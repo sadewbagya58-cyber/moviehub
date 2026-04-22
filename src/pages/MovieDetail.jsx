@@ -43,6 +43,11 @@ const MovieDetail = () => {
       formatted = formatted.replace('streamwish.to/', 'streamwish.to/e/');
     }
 
+    // Convert Google Drive links to preview format
+    if (formatted.includes('drive.google.com') && formatted.includes('/view')) {
+      formatted = formatted.replace('/view', '/preview');
+    }
+
     return formatted;
   };
 
