@@ -97,11 +97,11 @@ const MovieDetail = () => {
           <div className="lg:col-span-8 space-y-10">
             {/* 16:9 Iframe Container */}
             <div className="flex flex-col gap-6 md:gap-8 w-full">
-              <div className="relative w-full aspect-video min-h-[210px] sm:min-h-[300px] md:min-h-[450px] bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group flex items-center justify-center">
+              <div className="relative w-full aspect-video min-h-[250px] md:min-h-[450px] bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl block">
                 {movie.videoUrl ? (
                   <iframe
                     src={formatEmbedUrl(movie.videoUrl)}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute top-0 left-0 !w-full !h-full object-contain"
                     allowFullScreen
                     allow="autoplay; encrypted-media; picture-in-picture"
                     frameBorder="0"
