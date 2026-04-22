@@ -96,8 +96,8 @@ const MovieDetail = () => {
           {/* Left: Video Player Section */}
           <div className="lg:col-span-8 space-y-10">
             {/* 16:9 Iframe Container */}
-            <div className="space-y-6 md:space-y-8">
-              <div className="relative w-full aspect-video bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group">
+            <div className="space-y-8 md:space-y-10">
+              <div className="relative w-full h-0 pb-[56.25%] bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group">
                 {movie.videoUrl ? (
                   <iframe
                     src={formatEmbedUrl(movie.videoUrl)}
@@ -117,7 +117,7 @@ const MovieDetail = () => {
               </div>
 
               {/* Main Download Button below Player */}
-              <div className="flex justify-center md:justify-start">
+              <div className="flex justify-center md:justify-start mt-6 md:mt-0">
                 <a 
                   href={movie.videoUrl || '#'} 
                   target="_blank" 
