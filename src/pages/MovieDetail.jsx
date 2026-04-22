@@ -43,8 +43,8 @@ const MovieDetail = () => {
       formatted = formatted.replace('streamwish.to/', 'streamwish.to/e/');
     }
 
-    // Convert Google Drive links to preview format
-    if (formatted.includes('drive.google.com') && formatted.includes('/view')) {
+    // Convert Google Drive view links to preview
+    if (formatted.includes('drive.google.com/file/d/') && formatted.includes('/view')) {
       formatted = formatted.replace('/view', '/preview');
     }
 
@@ -82,7 +82,7 @@ const MovieDetail = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-bg/80 to-brand-bg" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-32">
         {/* Back Button */}
         <Link 
           to="/" 
@@ -96,8 +96,8 @@ const MovieDetail = () => {
           {/* Left: Video Player Section */}
           <div className="lg:col-span-8 space-y-10">
             {/* 16:9 Iframe Container */}
-            <div className="space-y-8">
-              <div className="relative w-full aspect-video bg-black rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group">
+            <div className="space-y-6 md:space-y-8">
+              <div className="relative w-full aspect-video bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group">
                 {movie.videoUrl ? (
                   <iframe
                     src={formatEmbedUrl(movie.videoUrl)}
@@ -122,7 +122,7 @@ const MovieDetail = () => {
                   href={movie.videoUrl || '#'} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="w-full md:w-auto inline-flex items-center justify-center gap-4 bg-brand-accent text-brand-bg px-14 py-6 rounded-2xl font-black text-xl transition-all duration-300 hover:scale-[1.02] hover:bg-white active:scale-95 shadow-[0_20px_40px_rgba(0,242,255,0.2)] hover:shadow-[0_25px_50px_rgba(0,242,255,0.4)] tracking-[0.2em]"
+                  className="w-full md:w-auto inline-flex items-center justify-center gap-4 bg-brand-accent text-brand-bg px-8 md:px-14 py-4 md:py-6 rounded-2xl font-black text-lg md:text-xl transition-all duration-300 hover:scale-[1.02] hover:bg-white active:scale-95 shadow-[0_20px_40px_rgba(0,242,255,0.2)] hover:shadow-[0_25px_50px_rgba(0,242,255,0.4)] tracking-[0.2em]"
                 >
                   <Download size={26} />
                   DOWNLOAD MOVIE NOW
@@ -133,7 +133,7 @@ const MovieDetail = () => {
             {/* Movie Info */}
             <div className="space-y-8">
               <div className="space-y-4">
-                <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase drop-shadow-lg">
+                <h1 className="text-3xl md:text-7xl font-black text-white tracking-tighter uppercase drop-shadow-lg leading-none">
                   {movie.title}
                 </h1>
                 <div className="flex items-center gap-6">
@@ -168,7 +168,7 @@ const MovieDetail = () => {
           {/* Right: Server & Alternate Downloads */}
           <div className="lg:col-span-4 space-y-10">
             {/* Server Selection */}
-            <div className="bg-brand-card/20 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 space-y-6">
+            <div className="bg-brand-card/20 backdrop-blur-xl border border-white/10 rounded-2xl lg:rounded-[2rem] p-6 md:p-8 space-y-6">
               <h3 className="text-xl font-black text-white tracking-tight flex items-center gap-3">
                 <Cpu size={22} className="text-brand-accent" />
                 Select Server
@@ -184,7 +184,7 @@ const MovieDetail = () => {
             </div>
 
             {/* Quality Section */}
-            <div className="bg-brand-card/20 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 space-y-8 shadow-[0_40px_80px_rgba(0,0,0,0.5)]">
+            <div className="bg-brand-card/20 backdrop-blur-xl border border-white/10 rounded-2xl lg:rounded-[2rem] p-6 md:p-8 space-y-8 shadow-[0_40px_80px_rgba(0,0,0,0.5)]">
               <h3 className="text-xl font-black text-white tracking-tight flex items-center gap-3">
                 <Download size={22} className="text-brand-accent" />
                 Available Qualities
