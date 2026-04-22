@@ -96,12 +96,12 @@ const MovieDetail = () => {
           {/* Left: Video Player Section */}
           <div className="lg:col-span-8 space-y-10">
             {/* 16:9 Iframe Container */}
-            <div className="space-y-8 md:space-y-10">
-              <div className="relative w-full h-0 pb-[56.25%] bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group">
+            <div className="flex flex-col gap-6 md:gap-8 w-full">
+              <div className="relative w-full h-0 pb-[56.25%] bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group block">
                 {movie.videoUrl ? (
                   <iframe
                     src={formatEmbedUrl(movie.videoUrl)}
-                    className="absolute inset-0 w-full h-full"
+                    className="absolute top-0 left-0 w-full h-full"
                     allowFullScreen
                     allow="autoplay; encrypted-media; picture-in-picture"
                     frameBorder="0"
@@ -110,14 +110,14 @@ const MovieDetail = () => {
                     sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-presentation allow-popups"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-brand-text/30 font-bold uppercase tracking-widest bg-brand-card/20">
+                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-brand-text/30 font-bold uppercase tracking-widest bg-brand-card/20">
                     Streaming link currently unavailable
                   </div>
                 )}
               </div>
 
               {/* Main Download Button below Player */}
-              <div className="flex justify-center md:justify-start mt-6 md:mt-0">
+              <div className="flex justify-center md:justify-start">
                 <a 
                   href={movie.videoUrl || '#'} 
                   target="_blank" 
