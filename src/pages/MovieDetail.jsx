@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Star, ArrowLeft, Download, ShieldCheck, Cpu, ExternalLink } from 'lucide-react';
+import ReactPlayer from 'react-player';
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -95,19 +96,30 @@ const MovieDetail = () => {
         <div className="grid lg:grid-cols-12 gap-12">
           {/* Left: Video Player Section */}
           <div className="lg:col-span-8 space-y-10">
-            {/* 16:9 Iframe Container */}
+            {/* 16:9 Video Player Container */}
             <div className="flex flex-col gap-6 md:gap-8 w-full">
-              <div className="relative w-full aspect-video min-h-[250px] md:min-h-[450px] bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl block">
+              {/* padding-bottom hack: the most reliable 16:9 method on all mobile browsers */}
+              <div
+                className="relative w-full bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl"
+                style={{ paddingBottom: '56.25%', height: 0 }}
+              >
                 {movie.videoUrl ? (
-                  <iframe
-                    src={formatEmbedUrl(movie.videoUrl)}
-                    className="absolute top-0 left-0 !w-full !h-full object-contain"
-                    allowFullScreen
-                    allow="autoplay; encrypted-media; picture-in-picture"
-                    frameBorder="0"
-                    title={movie.title}
-                    referrerPolicy="no-referrer"
-                    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-presentation allow-popups"
+                  <ReactPlayer
+                    url={movie.videoUrl}
+                    width="100%"
+                    height="100%"
+                    controls
+                    style={{ position: 'absolute', top: 0, left: 0 }}
+                    config={{
+                      youtube: {
+                        playerVars: { modestbranding: 1, rel: 0 },
+                      },
+                      file: {
+                        attributes: {
+                          controlsList: 'nodownload',
+                        },
+                      },
+                    }}
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-brand-text/30 font-bold uppercase tracking-widest bg-brand-card/20">
