@@ -145,23 +145,27 @@ const MovieDetail = () => {
           <div className="lg:col-span-8 space-y-10">
             {/* 16:9 Video Player Container */}
             <div className="flex flex-col gap-6 md:gap-8 w-full">
-              {/* Responsive 16:9 box — inline styles guarantee no mobile override */}
+              {/* Outer 16:9 box — #000 bg hides any white edge lines */}
               <div
-                className="relative w-full bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl"
-                style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}
+                className="relative w-full rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl"
+                style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', height: 0, overflow: 'hidden', backgroundColor: '#000' }}
               >
                 {movie.videoUrl ? (
                   useIframe ? (
-                    /* Google Drive / YouTube / StreamWish → iframe */
-                    <iframe
-                      src={formatEmbedUrl(movie.videoUrl)}
-                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
-                      allowFullScreen
-                      allow="autoplay; encrypted-media; picture-in-picture"
-                      title={movie.title}
-                      referrerPolicy="no-referrer"
-                      sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-presentation allow-popups"
-                    />
+                    /* Inner clipping wrapper — scale hides Drive header bars */
+                    <div
+                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
+                    >
+                      <iframe
+                        src={formatEmbedUrl(movie.videoUrl)}
+                        style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0, transform: 'scale(1.02)', transformOrigin: 'center center' }}
+                        allowFullScreen
+                        allow="autoplay; encrypted-media; picture-in-picture"
+                        title={movie.title}
+                        referrerPolicy="no-referrer"
+                        sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-presentation allow-popups"
+                      />
+                    </div>
                   ) : (
                     /* Direct video file → Plyr */
                     <video
@@ -174,16 +178,16 @@ const MovieDetail = () => {
                   )
                 ) : (
                   <div
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    className="text-brand-text/30 font-bold uppercase tracking-widest bg-brand-card/20"
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}
+                    className="text-brand-text/30 font-bold uppercase tracking-widest"
                   >
                     Streaming link currently unavailable
                   </div>
                 )}
               </div>
 
-              {/* Main Download Button below Player */}
-              <div className="flex justify-center md:justify-start">
+              {/* Main Download Button below Player — z-10 keeps it above player shadow */}
+              <div className="relative z-10 flex justify-center md:justify-start">
                 <a 
                   href={movie.videoUrl || '#'} 
                   target="_blank" 
