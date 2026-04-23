@@ -11,6 +11,7 @@ const MovieDetail = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activePlayer, setActivePlayer] = useState('player1');
   const videoRef = useRef(null);
   const plyrRef = useRef(null);
 
@@ -33,7 +34,7 @@ const MovieDetail = () => {
 
   // Initialize Plyr for direct video sources
   useEffect(() => {
-    if (movie?.videoUrl && !isEmbedSource(movie.videoUrl) && videoRef.current) {
+    if (activePlayer === 'player1' && movie?.videoUrl && !isEmbedSource(movie.videoUrl) && videoRef.current) {
       plyrRef.current = new Plyr(videoRef.current, {
         controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
         ratio: '16:9',
@@ -44,7 +45,7 @@ const MovieDetail = () => {
         plyrRef.current.destroy();
       }
     };
-  }, [movie]);
+  }, [movie, activePlayer]);
 
   // Detect if URL needs iframe (Google Drive, YouTube, StreamWish, etc.)
   const isEmbedSource = (url) => {
@@ -115,8 +116,10 @@ const MovieDetail = () => {
     );
   }
 
-  // Determine player type
-  const useIframe = !movie.videoUrl || isEmbedSource(movie.videoUrl);
+  // Determine player type and current URL based on activePlayer
+  const isPlayer1 = activePlayer === 'player1';
+  const currentUrl = isPlayer1 ? movie.videoUrl : movie.altVideoUrl;
+  const useIframe = isPlayer1 ? (!movie.videoUrl || isEmbedSource(movie.videoUrl)) : true;
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
@@ -143,21 +146,21 @@ const MovieDetail = () => {
         <div className="grid lg:grid-cols-12 gap-12">
           {/* Left: Video Player Section */}
           <div className="lg:col-span-8 space-y-10">
-            {/* 16:9 Video Player Container */}
+            {/* 16:9 Video Player Container and Controls */}
             <div className="flex flex-col gap-6 md:gap-8 w-full">
               {/* Outer 16:9 box — #000 bg hides any white edge lines */}
               <div
                 className="relative w-full rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl"
                 style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', height: 0, overflow: 'hidden', backgroundColor: '#000' }}
               >
-                {movie.videoUrl ? (
+                {currentUrl ? (
                   useIframe ? (
                     /* Inner clipping wrapper — scale hides Drive header bars */
                     <div
                       style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
                     >
                       <iframe
-                        src={formatEmbedUrl(movie.videoUrl)}
+                        src={formatEmbedUrl(currentUrl)}
                         style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0, transform: 'scale(1.02)', transformOrigin: 'center center' }}
                         allowFullScreen
                         allow="autoplay; encrypted-media; picture-in-picture"
@@ -173,17 +176,41 @@ const MovieDetail = () => {
                       style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain' }}
                       playsInline
                     >
-                      <source src={movie.videoUrl} />
+                      <source src={currentUrl} />
                     </video>
                   )
                 ) : (
                   <div
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}
-                    className="text-brand-text/30 font-bold uppercase tracking-widest"
+                    className="text-brand-text/30 font-bold uppercase tracking-widest text-center px-4"
                   >
-                    Streaming link currently unavailable
+                    {isPlayer1 ? "Player 1 Streaming link unavailable" : "Player 2 Streaming link unavailable"}
                   </div>
                 )}
+              </div>
+
+              {/* Player Selection Tabs */}
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                <button
+                  onClick={() => setActivePlayer('player1')}
+                  className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
+                    activePlayer === 'player1'
+                      ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
+                      : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
+                  }`}
+                >
+                  Player 1 (Direct)
+                </button>
+                <button
+                  onClick={() => setActivePlayer('player2')}
+                  className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
+                    activePlayer === 'player2'
+                      ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
+                      : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
+                  }`}
+                >
+                  Player 2 (Embedded)
+                </button>
               </div>
 
               {/* Main Download Button below Player — z-10 keeps it above player shadow */}

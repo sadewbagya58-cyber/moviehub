@@ -11,6 +11,7 @@ const Admin = () => {
     synopsis: '',
     poster: '',
     videoUrl: '',
+    altVideoUrl: '',
     type: 'Movie',
   });
 
@@ -50,7 +51,7 @@ const Admin = () => {
         createdAt: serverTimestamp(),
       });
       setSuccess(true);
-      setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', type: 'Movie' });
+      setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', type: 'Movie' });
       setGenres(['']);
       setDownloads([{ label: '', quality: '', url: '', size: '' }]);
       setTimeout(() => setSuccess(false), 3000);
@@ -104,15 +105,21 @@ const Admin = () => {
           {/* Media Links */}
           <div className="bg-brand-card/20 backdrop-blur-xl border border-white/5 p-8 rounded-[2rem] space-y-6">
             <h2 className="text-xl font-black text-white uppercase tracking-wider">Media Assets</h2>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid gap-6">
               <div className="space-y-2">
                 <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Poster URL</label>
                 <input required name="poster" value={formData.poster} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="https://..." />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Video / Stream URL</label>
-                <input name="videoUrl" value={formData.videoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="Google Drive, YouTube, or direct video link" />
-                <p className="text-[10px] text-brand-text/30 font-bold tracking-wider">Accepts any Google Drive share/view/open link — auto-converts to embed</p>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Video URL (Player 1)</label>
+                  <input name="videoUrl" value={formData.videoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="Direct video link (e.g. .mp4)" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Alternative Video URL (Player 2)</label>
+                  <input name="altVideoUrl" value={formData.altVideoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="Google Drive, YouTube, StreamWish" />
+                  <p className="text-[10px] text-brand-text/30 font-bold tracking-wider">Accepts any Google Drive share/view/open link — auto-converts to embed</p>
+                </div>
               </div>
             </div>
           </div>
