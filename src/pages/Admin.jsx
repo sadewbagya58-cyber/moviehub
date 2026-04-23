@@ -110,8 +110,9 @@ const Admin = () => {
                 <input required name="poster" value={formData.poster} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="https://..." />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Trailer/Video URL</label>
-                <input name="videoUrl" value={formData.videoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="YouTube ID or direct link" />
+                <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Video / Stream URL</label>
+                <input name="videoUrl" value={formData.videoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="Google Drive, YouTube, or direct video link" />
+                <p className="text-[10px] text-brand-text/30 font-bold tracking-wider">Accepts any Google Drive share/view/open link — auto-converts to embed</p>
               </div>
             </div>
           </div>

@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Star, ArrowLeft, Download, ShieldCheck, Cpu, ExternalLink } from 'lucide-react';
+import Plyr from 'plyr';
+import 'plyr/dist/plyr.css';
 
-// Build-ID: 102 — forced fresh deploy
+// Build-ID: 200 — Plyr + iframe hybrid
 const MovieDetail = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
+  const videoRef = useRef(null);
+  const plyrRef = useRef(null);
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -27,6 +31,33 @@ const MovieDetail = () => {
     fetchMovie();
   }, [id]);
 
+  // Initialize Plyr for direct video sources
+  useEffect(() => {
+    if (movie?.videoUrl && !isEmbedSource(movie.videoUrl) && videoRef.current) {
+      plyrRef.current = new Plyr(videoRef.current, {
+        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+        ratio: '16:9',
+      });
+    }
+    return () => {
+      if (plyrRef.current) {
+        plyrRef.current.destroy();
+      }
+    };
+  }, [movie]);
+
+  // Detect if URL needs iframe (Google Drive, YouTube, StreamWish, etc.)
+  const isEmbedSource = (url) => {
+    if (!url) return false;
+    return (
+      url.includes('drive.google.com') ||
+      url.includes('youtube.com') ||
+      url.includes('youtu.be') ||
+      url.includes('streamwish.to') ||
+      url.includes('vimeo.com')
+    );
+  };
+
   const formatEmbedUrl = (url) => {
     if (!url) return '';
     let formatted = url;
@@ -35,8 +66,8 @@ const MovieDetail = () => {
     if (formatted.includes('youtube.com/watch?v=')) {
       formatted = formatted.replace('watch?v=', 'embed/');
     } else if (formatted.includes('youtu.be/')) {
-      const id = formatted.split('/').pop();
-      formatted = `https://www.youtube.com/embed/${id}`;
+      const videoId = formatted.split('/').pop();
+      formatted = `https://www.youtube.com/embed/${videoId}`;
     }
 
     // Ensure StreamWish/SeekStreaming use the embed path
@@ -44,9 +75,22 @@ const MovieDetail = () => {
       formatted = formatted.replace('streamwish.to/', 'streamwish.to/e/');
     }
 
-    // Convert Google Drive view links to preview
-    if (formatted.includes('drive.google.com/file/d/') && formatted.includes('/view')) {
-      formatted = formatted.replace('/view', '/preview');
+    // Google Drive: handle all link formats → /preview
+    if (formatted.includes('drive.google.com')) {
+      // Extract file ID from various Drive URL formats
+      const patterns = [
+        /\/file\/d\/([a-zA-Z0-9_-]+)/,        // /file/d/ID/view or /file/d/ID/preview
+        /[?&]id=([a-zA-Z0-9_-]+)/,            // ?id=ID (open?id=)
+        /\/d\/([a-zA-Z0-9_-]+)/,              // /d/ID
+      ];
+      let fileId = null;
+      for (const pattern of patterns) {
+        const match = formatted.match(pattern);
+        if (match) { fileId = match[1]; break; }
+      }
+      if (fileId) {
+        formatted = `https://drive.google.com/file/d/${fileId}/preview`;
+      }
     }
 
     return formatted;
@@ -70,6 +114,9 @@ const MovieDetail = () => {
       </div>
     );
   }
+
+  // Determine player type
+  const useIframe = !movie.videoUrl || isEmbedSource(movie.videoUrl);
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
@@ -98,23 +145,38 @@ const MovieDetail = () => {
           <div className="lg:col-span-8 space-y-10">
             {/* 16:9 Video Player Container */}
             <div className="flex flex-col gap-6 md:gap-8 w-full">
-              {/* padding-bottom hack: the most reliable 16:9 method on all mobile browsers */}
+              {/* Responsive 16:9 box — inline styles guarantee no mobile override */}
               <div
                 className="relative w-full bg-black rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl"
-                style={{ paddingBottom: '56.25%', height: 0 }}
+                style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}
               >
                 {movie.videoUrl ? (
-                  <iframe
-                    src={formatEmbedUrl(movie.videoUrl)}
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
-                    allowFullScreen
-                    allow="autoplay; encrypted-media; picture-in-picture"
-                    title="Movie Player"
-                    referrerPolicy="no-referrer"
-                    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-presentation allow-popups"
-                  />
+                  useIframe ? (
+                    /* Google Drive / YouTube / StreamWish → iframe */
+                    <iframe
+                      src={formatEmbedUrl(movie.videoUrl)}
+                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                      allowFullScreen
+                      allow="autoplay; encrypted-media; picture-in-picture"
+                      title={movie.title}
+                      referrerPolicy="no-referrer"
+                      sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-presentation allow-popups"
+                    />
+                  ) : (
+                    /* Direct video file → Plyr */
+                    <video
+                      ref={videoRef}
+                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain' }}
+                      playsInline
+                    >
+                      <source src={movie.videoUrl} />
+                    </video>
+                  )
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-brand-text/30 font-bold uppercase tracking-widest bg-brand-card/20">
+                  <div
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    className="text-brand-text/30 font-bold uppercase tracking-widest bg-brand-card/20"
+                  >
                     Streaming link currently unavailable
                   </div>
                 )}
