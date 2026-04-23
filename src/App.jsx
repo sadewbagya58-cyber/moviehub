@@ -7,7 +7,7 @@ import Admin from './pages/Admin';
 function App() {
   return (
     <Router>
-      <div className="flex flex-col min-h-screen bg-brand-bg text-brand-text">
+      <div className="flex flex-col min-h-screen bg-brand-bg text-brand-text overflow-x-hidden">
         <Navbar />
         <main className="flex-grow">
           <Routes>
