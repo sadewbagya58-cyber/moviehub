@@ -179,15 +179,15 @@ const MovieDetail = () => {
                     <div
                       style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
                     >
-                      <iframe
-                        src={formatEmbedUrl(currentUrl)}
-                        style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0, transform: 'scale(1.02)', transformOrigin: 'center center' }}
-                        allowFullScreen
-                        allow="autoplay; encrypted-media; picture-in-picture"
-                        title={movie.title}
-                        referrerPolicy="no-referrer"
-                        sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-presentation allow-popups"
-                      />
+                        <iframe
+                          src={formatEmbedUrl(currentUrl)}
+                          style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0, transform: 'scale(1.02)', transformOrigin: 'center center' }}
+                          allowFullScreen
+                          allow="autoplay; encrypted-media; picture-in-picture"
+                          title={movie.title}
+                          referrerPolicy="no-referrer"
+                          sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
+                        />
                     </div>
                   ) : (
                     /* Direct video file → Plyr */
