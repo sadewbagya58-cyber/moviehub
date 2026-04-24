@@ -186,7 +186,6 @@ const MovieDetail = () => {
                           allow="autoplay; encrypted-media"
                           title={movie.title}
                           referrerPolicy="no-referrer"
-                          sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation allow-popups allow-popups-to-escape-sandbox"
                         />
                     </div>
                   ) : (
