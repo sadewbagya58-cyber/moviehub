@@ -182,11 +182,11 @@ const MovieDetail = () => {
                         <iframe
                           src={formatEmbedUrl(currentUrl)}
                           style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0, transform: 'scale(1.02)', transformOrigin: 'center center' }}
-                          allowFullScreen
-                          allow="autoplay; encrypted-media; picture-in-picture"
+                          allowFullScreen={true}
+                          allow="autoplay; encrypted-media"
                           title={movie.title}
                           referrerPolicy="no-referrer"
-                          sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
+                          sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation allow-popups allow-popups-to-escape-sandbox"
                         />
                     </div>
                   ) : (
