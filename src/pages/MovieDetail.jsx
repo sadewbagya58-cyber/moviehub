@@ -12,6 +12,7 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activePlayer, setActivePlayer] = useState('player1');
+  const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef(null);
   const plyrRef = useRef(null);
 
@@ -34,18 +35,20 @@ const MovieDetail = () => {
 
   // Initialize Plyr for direct video sources
   useEffect(() => {
-    if (activePlayer === 'player1' && movie?.videoUrl && !isEmbedSource(movie.videoUrl) && videoRef.current) {
+    if (isPlaying && activePlayer === 'player1' && movie?.videoUrl && !isEmbedSource(movie.videoUrl) && videoRef.current) {
       plyrRef.current = new Plyr(videoRef.current, {
         controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
         ratio: '16:9',
+        autoplay: true,
       });
+      plyrRef.current.play().catch(() => {}); // Attempt to auto-play when user clicks thumbnail
     }
     return () => {
       if (plyrRef.current) {
         plyrRef.current.destroy();
       }
     };
-  }, [movie, activePlayer]);
+  }, [movie, activePlayer, isPlaying]);
 
   // Detect if URL needs iframe (Google Drive, YouTube, StreamWish, etc.)
   const isEmbedSource = (url) => {
@@ -55,13 +58,20 @@ const MovieDetail = () => {
       url.includes('youtube.com') ||
       url.includes('youtu.be') ||
       url.includes('streamwish.to') ||
-      url.includes('vimeo.com')
+      url.includes('vimeo.com') ||
+      url.includes('4meplayer.com') ||
+      url.includes('vidhide')
     );
   };
 
   const formatEmbedUrl = (url) => {
     if (!url) return '';
     let formatted = url;
+
+    // Check if it is already an embed URL we support without changes
+    if (formatted.includes('4meplayer.com') || formatted.includes('vidhide')) {
+      return formatted;
+    }
 
     // Convert YouTube links to embed format
     if (formatted.includes('youtube.com/watch?v=')) {
@@ -150,10 +160,20 @@ const MovieDetail = () => {
             <div className="flex flex-col gap-6 md:gap-8 w-full">
               {/* Outer 16:9 box — #000 bg hides any white edge lines */}
               <div
-                className="relative w-full rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl"
+                className="relative w-full rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group"
                 style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', height: 0, overflow: 'hidden', backgroundColor: '#000' }}
               >
-                {currentUrl ? (
+                {!isPlaying ? (
+                  <div 
+                    className="absolute inset-0 cursor-pointer flex items-center justify-center bg-black z-20"
+                    onClick={() => setIsPlaying(true)}
+                  >
+                    <img src={movie.poster} alt={movie.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-300" />
+                    <div className="absolute w-20 h-20 bg-brand-accent/90 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(0,242,255,0.5)] group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-10 h-10 text-brand-bg translate-x-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                    </div>
+                  </div>
+                ) : currentUrl ? (
                   useIframe ? (
                     /* Inner clipping wrapper — scale hides Drive header bars */
                     <div
@@ -192,7 +212,7 @@ const MovieDetail = () => {
               {/* Player Selection Tabs */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                 <button
-                  onClick={() => setActivePlayer('player1')}
+                  onClick={() => { setActivePlayer('player1'); setIsPlaying(false); }}
                   className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
                     activePlayer === 'player1'
                       ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
@@ -202,7 +222,7 @@ const MovieDetail = () => {
                   Player 1 (Direct)
                 </button>
                 <button
-                  onClick={() => setActivePlayer('player2')}
+                  onClick={() => { setActivePlayer('player2'); setIsPlaying(false); }}
                   className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
                     activePlayer === 'player2'
                       ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'

@@ -117,8 +117,8 @@ const Admin = () => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Alternative Video URL (Player 2)</label>
-                  <input name="altVideoUrl" value={formData.altVideoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="Google Drive, YouTube, StreamWish" />
-                  <p className="text-[10px] text-brand-text/30 font-bold tracking-wider">Accepts any Google Drive share/view/open link — auto-converts to embed</p>
+                  <input name="altVideoUrl" value={formData.altVideoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="Player4Me, Vidhide, Google Drive, etc." />
+                  <p className="text-[10px] text-brand-text/30 font-bold tracking-wider">Accepts iframe sources (Player4Me, Vidhide) and auto-converts Drive/YouTube links</p>
                 </div>
               </div>
             </div>
