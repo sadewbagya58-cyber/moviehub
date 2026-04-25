@@ -11,7 +11,7 @@ const MovieDetail = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activePlayer, setActivePlayer] = useState('player1');
+  const [activePlayer, setActivePlayer] = useState('server1');
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef(null);
   const plyrRef = useRef(null);
@@ -126,24 +126,13 @@ const MovieDetail = () => {
     );
   }
 
-  // Determine player type and current URL based on activePlayer
-  const isPlayer1 = activePlayer === 'player1';
-  const isPlayer2 = activePlayer === 'player2';
-  const isPlayer3 = activePlayer === 'player3';
-
-  let currentUrl = '';
-  let useIframe = false;
-
-  if (isPlayer1) {
-    currentUrl = movie.videoUrl;
-    useIframe = !movie.videoUrl || isEmbedSource(movie.videoUrl);
-  } else if (isPlayer2) {
-    currentUrl = movie.altVideoUrl;
-    useIframe = true;
-  } else if (isPlayer3) {
-    currentUrl = `https://vidsrc.me/embed/movie/${movie.imdb_id}`;
-    useIframe = true;
-  }
+  // Server URLs based on IMDB ID
+  const isServer1 = activePlayer === 'server1';
+  const currentUrl = isServer1 
+    ? `https://vidsrc.me/embed/movie/${movie.imdb_id}`
+    : `https://vidsrc.cc/v2/embed/movie/${movie.imdb_id}`;
+  
+  const useIframe = true;
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
@@ -193,29 +182,20 @@ const MovieDetail = () => {
                       style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
                     >
                         <iframe
-                          src={isPlayer3 ? currentUrl : formatEmbedUrl(currentUrl)}
-                          style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0, transform: isPlayer3 ? 'none' : 'scale(1.02)', transformOrigin: 'center center' }}
+                          src={currentUrl}
+                          style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0 }}
                           allowFullScreen={true}
                           allow="autoplay; encrypted-media"
                           title={movie.title}
-                          referrerPolicy={isPlayer3 ? "origin" : "no-referrer"}
+                          referrerPolicy="origin"
                         />
                     </div>
-                  ) : (
-                    <video
-                      ref={videoRef}
-                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain' }}
-                      playsInline
-                    >
-                      <source src={currentUrl} />
-                    </video>
-                  )
                 ) : (
                   <div
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}
                     className="text-brand-text/30 font-bold uppercase tracking-widest text-center px-4"
                   >
-                    {isPlayer1 ? "Player 1 Streaming link unavailable" : isPlayer2 ? "Player 2 Streaming link unavailable" : "Player 3 IMDB ID unavailable"}
+                    IMDB ID unavailable for this movie
                   </div>
                 )}
               </div>
@@ -223,37 +203,25 @@ const MovieDetail = () => {
               {/* Player Selection Tabs */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                 <button
-                  onClick={() => { setActivePlayer('player1'); setIsPlaying(false); }}
+                  onClick={() => { setActivePlayer('server1'); setIsPlaying(false); }}
                   className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
-                    activePlayer === 'player1'
+                    activePlayer === 'server1'
                       ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
                       : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
                   }`}
                 >
-                  Player 1 (Direct)
+                  Server 1
                 </button>
                 <button
-                  onClick={() => { setActivePlayer('player2'); setIsPlaying(false); }}
+                  onClick={() => { setActivePlayer('server2'); setIsPlaying(false); }}
                   className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
-                    activePlayer === 'player2'
+                    activePlayer === 'server2'
                       ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
                       : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
                   }`}
                 >
-                  Player 2 (Manual)
+                  Server 2
                 </button>
-                {movie.imdb_id && (
-                  <button
-                    onClick={() => { setActivePlayer('player3'); setIsPlaying(false); }}
-                    className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
-                      activePlayer === 'player3'
-                        ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
-                        : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
-                    }`}
-                  >
-                    Player 3 (Vidsrc)
-                  </button>
-                )}
               </div>
 
  
