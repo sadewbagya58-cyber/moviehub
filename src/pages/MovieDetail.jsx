@@ -189,21 +189,19 @@ const MovieDetail = () => {
                   </div>
                 ) : currentUrl ? (
                   useIframe ? (
-                    /* Inner clipping wrapper — scale hides Drive header bars */
-                      <div
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
-                      >
-                          <iframe
-                            src={isPlayer3 ? currentUrl : formatEmbedUrl(currentUrl)}
-                            style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0, transform: isPlayer3 ? 'none' : 'scale(1.02)', transformOrigin: 'center center' }}
-                            allowFullScreen={true}
-                            allow="autoplay; encrypted-media"
-                            title={movie.title}
-                            referrerPolicy={isPlayer3 ? "origin" : "no-referrer"}
-                          />
-                      </div>
+                    <div
+                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
+                    >
+                        <iframe
+                          src={isPlayer3 ? currentUrl : formatEmbedUrl(currentUrl)}
+                          style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0, transform: isPlayer3 ? 'none' : 'scale(1.02)', transformOrigin: 'center center' }}
+                          allowFullScreen={true}
+                          allow="autoplay; encrypted-media"
+                          title={movie.title}
+                          referrerPolicy={isPlayer3 ? "origin" : "no-referrer"}
+                        />
+                    </div>
                   ) : (
-                    /* Direct video file → Plyr */
                     <video
                       ref={videoRef}
                       style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain' }}
@@ -258,7 +256,7 @@ const MovieDetail = () => {
                 )}
               </div>
 
-              </div>
+ 
 
               {/* Subtitle Toolbox */}
               {movie.sub_url && (

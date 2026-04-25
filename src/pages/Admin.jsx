@@ -33,12 +33,6 @@ const Admin = () => {
     setGenres(newGenres);
   };
 
-  const handleGenreChange = (index, value) => {
-    const newGenres = [...genres];
-    newGenres[index] = value;
-    setGenres(newGenres);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -152,8 +146,8 @@ const Admin = () => {
             </div>
           </div>
 
-            </div>
-          </div>
+ 
+
 
           <button type="submit" disabled={loading} className="w-full bg-brand-accent text-brand-bg py-6 rounded-[2rem] font-black text-lg tracking-[0.2em] hover:bg-white hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-[0_20px_40px_rgba(0,242,255,0.2)] cursor-pointer">
             {loading ? (
