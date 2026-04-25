@@ -141,7 +141,7 @@ const MovieDetail = () => {
     currentUrl = movie.altVideoUrl;
     useIframe = true;
   } else if (isPlayer3) {
-    currentUrl = `https://vidsrc.to/embed/movie/${movie.imdb_id}`;
+    currentUrl = `https://vidsrc.xyz/embed/movie/${movie.imdb_id}`;
     useIframe = true;
   }
 
@@ -199,8 +199,8 @@ const MovieDetail = () => {
                             allowFullScreen={true}
                             allow="autoplay; encrypted-media"
                             title={movie.title}
-                            referrerPolicy="no-referrer"
-                            sandbox={isPlayer3 ? "allow-forms allow-scripts allow-pointer-lock allow-same-origin allow-top-navigation" : undefined}
+                            referrerPolicy={isPlayer3 ? "origin" : "no-referrer"}
+                            sandbox={isPlayer3 ? "allow-forms allow-scripts allow-pointer-lock allow-same-origin allow-top-navigation allow-presentation" : undefined}
                           />
                       </div>
                   ) : (
