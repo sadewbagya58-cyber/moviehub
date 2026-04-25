@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Star, ArrowLeft, Download, ShieldCheck, Cpu, ExternalLink } from 'lucide-react';
+import { Star, ArrowLeft, Download, ShieldCheck, Cpu, ExternalLink, FileText, Info } from 'lucide-react';
 import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
 
@@ -270,6 +270,32 @@ const MovieDetail = () => {
                   DOWNLOAD MOVIE NOW
                 </a>
               </div>
+
+              {/* Subtitle Toolbox */}
+              {movie.sub_url && (
+                <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-[2rem] p-6 md:p-8 space-y-6">
+                  <div className="flex items-center gap-3">
+                    <FileText className="text-brand-accent" size={24} />
+                    <h3 className="text-xl font-black text-white uppercase tracking-wider">Subtitle Toolbox</h3>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-6">
+                    <a 
+                      href={movie.sub_url}
+                      download
+                      className="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white text-white hover:text-brand-bg px-8 py-4 rounded-xl font-black transition-all border border-white/10"
+                    >
+                      <Download size={20} />
+                      DOWNLOAD SRT
+                    </a>
+                    <div className="flex items-start gap-2 text-brand-text/60 max-w-md">
+                      <Info size={18} className="text-brand-accent shrink-0 mt-0.5" />
+                      <p className="text-sm font-medium leading-relaxed">
+                        Download the SRT file, then click the CC/Settings icon in the player and select <span className="text-white font-bold">"Upload/Custom Subtitle"</span> to load it.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Movie Info */}
