@@ -127,12 +127,9 @@ const MovieDetail = () => {
   }
 
   // Server URLs based on IMDB ID
-  const isServer1 = activePlayer === 'server1';
-  const currentUrl = isServer1 
+  const currentUrl = activePlayer === 'server1' 
     ? `https://vidsrc.me/embed/movie/${movie.imdb_id}`
     : `https://vidsrc.cc/v2/embed/movie/${movie.imdb_id}`;
-  
-  const useIframe = true;
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
@@ -177,19 +174,18 @@ const MovieDetail = () => {
                     </div>
                   </div>
                 ) : currentUrl ? (
-                  useIframe ? (
-                    <div
-                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
-                    >
-                        <iframe
-                          src={currentUrl}
-                          style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0 }}
-                          allowFullScreen={true}
-                          allow="autoplay; encrypted-media"
-                          title={movie.title}
-                          referrerPolicy="origin"
-                        />
-                    </div>
+                  <div
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
+                  >
+                      <iframe
+                        src={currentUrl}
+                        style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0 }}
+                        allowFullScreen={true}
+                        allow="autoplay; encrypted-media"
+                        title={movie.title}
+                        referrerPolicy="origin"
+                      />
+                  </div>
                 ) : (
                   <div
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}
