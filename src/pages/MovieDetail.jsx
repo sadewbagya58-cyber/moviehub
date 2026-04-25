@@ -141,7 +141,7 @@ const MovieDetail = () => {
     currentUrl = movie.altVideoUrl;
     useIframe = true;
   } else if (isPlayer3) {
-    currentUrl = `https://vidsrc.xyz/embed/movie/${movie.imdb_id}`;
+    currentUrl = `https://vidsrc.me/embed/movie/${movie.imdb_id}`;
     useIframe = true;
   }
 
@@ -200,7 +200,6 @@ const MovieDetail = () => {
                             allow="autoplay; encrypted-media"
                             title={movie.title}
                             referrerPolicy={isPlayer3 ? "origin" : "no-referrer"}
-                            sandbox={isPlayer3 ? "allow-forms allow-scripts allow-pointer-lock allow-same-origin allow-top-navigation allow-presentation" : undefined}
                           />
                       </div>
                   ) : (
