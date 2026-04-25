@@ -258,17 +258,6 @@ const MovieDetail = () => {
                 )}
               </div>
 
-              {/* Main Download Button below Player — z-10 keeps it above player shadow */}
-              <div className="relative z-10 flex justify-center md:justify-start">
-                <a 
-                  href={movie.videoUrl || '#'} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="w-full md:w-auto inline-flex items-center justify-center gap-4 bg-brand-accent text-brand-bg px-8 md:px-14 py-4 md:py-6 rounded-2xl font-black text-lg md:text-xl transition-all duration-300 hover:scale-[1.02] hover:bg-white active:scale-95 shadow-[0_20px_40px_rgba(0,242,255,0.2)] hover:shadow-[0_25px_50px_rgba(0,242,255,0.4)] tracking-[0.2em]"
-                >
-                  <Download size={26} />
-                  DOWNLOAD MOVIE NOW
-                </a>
               </div>
 
               {/* Subtitle Toolbox */}
@@ -351,33 +340,6 @@ const MovieDetail = () => {
               </div>
             </div>
 
-            {/* Quality Section */}
-            <div className="bg-brand-card/20 backdrop-blur-xl border border-white/10 rounded-2xl lg:rounded-[2rem] p-6 md:p-8 space-y-8 shadow-[0_40px_80px_rgba(0,0,0,0.5)]">
-              <h3 className="text-xl font-black text-white tracking-tight flex items-center gap-3">
-                <Download size={22} className="text-brand-accent" />
-                Available Qualities
-              </h3>
-              <div className="grid gap-4">
-                {movie.downloads && movie.downloads.map((link) => (
-                  <a 
-                    href={link.url || '#'} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    key={link.quality || Math.random()}
-                    className="group relative flex flex-col items-start gap-1 bg-white/5 border border-white/10 p-6 rounded-2xl hover:border-brand-accent transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,242,255,0.1)] cursor-pointer overflow-hidden text-left w-full"
-                  >
-                    <div className="absolute top-0 right-0 p-4 opacity-5 scale-[2] rotate-12 -z-10 text-brand-accent group-hover:scale-[2.5] group-hover:opacity-10 transition-all duration-500">
-                      <Download size={48} />
-                    </div>
-                    <span className="text-brand-accent text-[10px] font-black tracking-[0.3em] uppercase mb-1">{link.quality || 'HD'}</span>
-                    <div className="flex items-center justify-between w-full">
-                      <span className="text-white font-black text-lg">{link.label}</span>
-                      <span className="text-brand-text/30 text-xs font-black">{link.size}</span>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>
