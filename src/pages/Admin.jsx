@@ -12,6 +12,7 @@ const Admin = () => {
     poster: '',
     videoUrl: '',
     altVideoUrl: '',
+    imdb_id: '',
     type: 'Movie',
   });
 
@@ -51,7 +52,7 @@ const Admin = () => {
         createdAt: serverTimestamp(),
       });
       setSuccess(true);
-      setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', type: 'Movie' });
+      setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', type: 'Movie' });
       setGenres(['']);
       setDownloads([{ label: '', quality: '', url: '', size: '' }]);
       setTimeout(() => setSuccess(false), 3000);
@@ -110,17 +111,22 @@ const Admin = () => {
                 <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Poster URL</label>
                 <input required name="poster" value={formData.poster} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="https://..." />
               </div>
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Video URL (Player 1)</label>
                   <input name="videoUrl" value={formData.videoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="Direct video link (e.g. .mp4)" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Alternative Video URL (Player 2)</label>
-                  <input name="altVideoUrl" value={formData.altVideoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="Player4Me, Vidhide, Google Drive, etc." />
-                  <p className="text-[10px] text-brand-text/30 font-bold tracking-wider">Accepts iframe sources (Player4Me, Vidhide) and auto-converts Drive/YouTube links</p>
+                  <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Alt Video URL (Player 2)</label>
+                  <input name="altVideoUrl" value={formData.altVideoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="Iframe/Drive link" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">IMDB ID (Player 3)</label>
+                  <input name="imdb_id" value={formData.imdb_id} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="tt2527336" />
                 </div>
               </div>
+              <p className="text-[10px] text-brand-text/30 font-bold tracking-wider uppercase">Player 1: Direct MP4 | Player 2: External Embeds | Player 3: Auto-generated from IMDB ID</p>
+
             </div>
           </div>
 

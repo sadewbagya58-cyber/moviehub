@@ -128,8 +128,22 @@ const MovieDetail = () => {
 
   // Determine player type and current URL based on activePlayer
   const isPlayer1 = activePlayer === 'player1';
-  const currentUrl = isPlayer1 ? movie.videoUrl : movie.altVideoUrl;
-  const useIframe = isPlayer1 ? (!movie.videoUrl || isEmbedSource(movie.videoUrl)) : true;
+  const isPlayer2 = activePlayer === 'player2';
+  const isPlayer3 = activePlayer === 'player3';
+
+  let currentUrl = '';
+  let useIframe = false;
+
+  if (isPlayer1) {
+    currentUrl = movie.videoUrl;
+    useIframe = !movie.videoUrl || isEmbedSource(movie.videoUrl);
+  } else if (isPlayer2) {
+    currentUrl = movie.altVideoUrl;
+    useIframe = true;
+  } else if (isPlayer3) {
+    currentUrl = `https://vidsrc.to/embed/movie/${movie.imdb_id}`;
+    useIframe = true;
+  }
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
@@ -176,18 +190,19 @@ const MovieDetail = () => {
                 ) : currentUrl ? (
                   useIframe ? (
                     /* Inner clipping wrapper — scale hides Drive header bars */
-                    <div
-                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
-                    >
-                        <iframe
-                          src={formatEmbedUrl(currentUrl)}
-                          style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0, transform: 'scale(1.02)', transformOrigin: 'center center' }}
-                          allowFullScreen={true}
-                          allow="autoplay; encrypted-media"
-                          title={movie.title}
-                          referrerPolicy="no-referrer"
-                        />
-                    </div>
+                      <div
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
+                      >
+                          <iframe
+                            src={isPlayer3 ? currentUrl : formatEmbedUrl(currentUrl)}
+                            style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0, transform: isPlayer3 ? 'none' : 'scale(1.02)', transformOrigin: 'center center' }}
+                            allowFullScreen={true}
+                            allow="autoplay; encrypted-media"
+                            title={movie.title}
+                            referrerPolicy="no-referrer"
+                            sandbox={isPlayer3 ? "allow-forms allow-scripts allow-pointer-lock allow-same-origin allow-top-navigation" : undefined}
+                          />
+                      </div>
                   ) : (
                     /* Direct video file → Plyr */
                     <video
@@ -203,7 +218,7 @@ const MovieDetail = () => {
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}
                     className="text-brand-text/30 font-bold uppercase tracking-widest text-center px-4"
                   >
-                    {isPlayer1 ? "Player 1 Streaming link unavailable" : "Player 2 Streaming link unavailable"}
+                    {isPlayer1 ? "Player 1 Streaming link unavailable" : isPlayer2 ? "Player 2 Streaming link unavailable" : "Player 3 IMDB ID unavailable"}
                   </div>
                 )}
               </div>
@@ -228,8 +243,20 @@ const MovieDetail = () => {
                       : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
                   }`}
                 >
-                  Player 2 (Embedded)
+                  Player 2 (Manual)
                 </button>
+                {movie.imdb_id && (
+                  <button
+                    onClick={() => { setActivePlayer('player3'); setIsPlaying(false); }}
+                    className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
+                      activePlayer === 'player3'
+                        ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
+                        : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
+                    }`}
+                  >
+                    Player 3 (Vidsrc)
+                  </button>
+                )}
               </div>
 
               {/* Main Download Button below Player — z-10 keeps it above player shadow */}
