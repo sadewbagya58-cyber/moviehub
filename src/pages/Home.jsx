@@ -11,6 +11,8 @@ const Home = () => {
   const [error, setError] = useState(null);
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
+  const typeFilter = searchParams.get('type') || '';
+  const sortFilter = searchParams.get('sort') || '';
 
   useEffect(() => {
     // Initial attempt with ordering
@@ -45,14 +47,16 @@ const Home = () => {
   }, []);
 
   const filteredMovies = movies.filter(movie => {
-    if (!searchQuery) return true;
     const term = searchQuery.toLowerCase();
+    const matchesSearch = !searchQuery || (
+      movie.title?.toLowerCase().includes(term) ||
+      movie.genres?.some(g => g.toLowerCase().includes(term)) ||
+      movie.cast?.some(c => c.toLowerCase().includes(term))
+    );
     
-    const matchTitle = movie.title?.toLowerCase().includes(term);
-    const matchGenre = movie.genres?.some(g => g.toLowerCase().includes(term));
-    const matchCast = movie.cast?.some(c => c.toLowerCase().includes(term));
+    const matchesType = !typeFilter || movie.type === typeFilter;
     
-    return matchTitle || matchGenre || matchCast;
+    return matchesSearch && matchesType;
   });
 
   return (
@@ -72,6 +76,8 @@ const Home = () => {
           <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight">
             {searchQuery ? (
               <>Search Results for <span className="text-brand-accent">'{searchQuery}'</span></>
+            ) : typeFilter ? (
+               <><span className="text-brand-accent">{typeFilter === 'TV' ? 'TV Series' : typeFilter}</span></>
             ) : (
               <>Trending <span className="text-brand-accent">Now</span></>
             )}
