@@ -134,7 +134,7 @@ const MovieDetail = () => {
   if (activePlayer === 'server1') {
     currentUrl = `https://vidsrc.me/embed/${typePrefix}/${movie.imdb_id}`;
   } else if (activePlayer === 'server2') {
-    currentUrl = `https://vidsrc.cc/v2/embed/${typePrefix}/${movie.imdb_id}`;
+    currentUrl = `https://vidsrc.xyz/embed/${typePrefix}/${movie.imdb_id}`;
   } else if (activePlayer === 'server3') {
     currentUrl = `https://multiembed.mov/?video_id=${movie.imdb_id}`;
   }
