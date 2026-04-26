@@ -134,7 +134,7 @@ const MovieDetail = () => {
   if (activePlayer === 'server1') {
     currentUrl = `https://vidsrc.me/embed/${typePrefix}/${imdbId}`;
   } else if (activePlayer === 'server2') {
-    currentUrl = `https://vidsrc.to/embed/${typePrefix}/${imdbId}`;
+    currentUrl = `https://player.smashy.stream/anime/${imdbId}?s=1&e=1`;
   } else if (activePlayer === 'server3') {
     currentUrl = `https://multiembed.mov/?video_id=${imdbId}`;
   }
