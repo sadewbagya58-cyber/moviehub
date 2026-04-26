@@ -13,6 +13,8 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activePlayer, setActivePlayer] = useState('server1');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedSeason, setSelectedSeason] = useState(1);
+  const [selectedEpisode, setSelectedEpisode] = useState(1);
   const videoRef = useRef(null);
   const plyrRef = useRef(null);
 
@@ -128,9 +130,15 @@ const MovieDetail = () => {
 
   // Server URLs based on IMDB ID
   const typePrefix = movie?.type === 'TV Series' || movie?.type === 'TV' ? 'tv' : 'movie';
+  const episodeQuery = typePrefix === 'tv' ? `&s=${selectedSeason}&e=${selectedEpisode}` : '';
   const currentUrl = activePlayer === 'server1' 
-    ? `https://vidsrc.me/embed/${typePrefix}/${movie.imdb_id}`
-    : `https://vidsrc.cc/v2/embed/${typePrefix}/${movie.imdb_id}`;
+    ? `https://vidsrc.me/embed/${typePrefix}/${movie.imdb_id}${episodeQuery}`
+    : `https://vidsrc.cc/v2/embed/${typePrefix}/${movie.imdb_id}${episodeQuery}`;
+
+  const episodeCounts = movie?.episodesPerSeason 
+    ? movie.episodesPerSeason.split(',').map(n => parseInt(n.trim())) 
+    : Array(parseInt(movie?.totalSeasons || 1)).fill(12);
+  const currentSeasonEpisodeCount = episodeCounts[selectedSeason - 1] || 12;
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
@@ -220,6 +228,57 @@ const MovieDetail = () => {
                   Server 2
                 </button>
               </div>
+
+              {/* Season and Episode Selector */}
+              {typePrefix === 'tv' && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  {/* Season Selector */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-brand-text/40 font-black text-xs uppercase tracking-[0.2em]">
+                      <span>Select Season</span>
+                      <div className="h-px flex-grow bg-white/5" />
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {Array.from({ length: parseInt(movie.totalSeasons || 1) }, (_, i) => i + 1).map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => { setSelectedSeason(s); setSelectedEpisode(1); setIsPlaying(false); }}
+                          className={`px-6 py-3 rounded-xl font-black text-sm transition-all duration-300 border ${
+                            selectedSeason === s
+                              ? 'bg-brand-accent text-brand-bg border-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
+                              : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
+                          }`}
+                        >
+                          S{s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Episode Selector */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-brand-text/40 font-black text-xs uppercase tracking-[0.2em]">
+                      <span>Select Episode</span>
+                      <div className="h-px flex-grow bg-white/5" />
+                    </div>
+                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
+                      {Array.from({ length: currentSeasonEpisodeCount }, (_, i) => i + 1).map((e) => (
+                        <button
+                          key={e}
+                          onClick={() => { setSelectedEpisode(e); setIsPlaying(true); }}
+                          className={`aspect-square flex items-center justify-center rounded-lg font-black text-xs transition-all duration-300 border ${
+                            selectedEpisode === e
+                              ? 'bg-brand-accent text-brand-bg border-brand-accent shadow-[0_0_15px_rgba(0,242,255,0.3)] scale-110 z-10'
+                              : 'bg-white/5 border-white/10 text-brand-text/40 hover:text-white hover:border-white/30 hover:scale-105'
+                          }`}
+                        >
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
  
 

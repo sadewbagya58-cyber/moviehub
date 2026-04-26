@@ -15,6 +15,8 @@ const Admin = () => {
     imdb_id: '',
     sub_url: '',
     type: 'Movie',
+    totalSeasons: '1',
+    episodesPerSeason: '12',
   });
 
   const [genres, setGenres] = useState(['']);
@@ -43,7 +45,7 @@ const Admin = () => {
         createdAt: serverTimestamp(),
       });
       setSuccess(true);
-      setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', sub_url: '', type: 'Movie' });
+      setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', sub_url: '', type: 'Movie', totalSeasons: '1', episodesPerSeason: '12' });
       setGenres(['']);
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
@@ -101,6 +103,35 @@ const Admin = () => {
                 <option value="TV Series" className="bg-brand-bg text-white">TV Series</option>
               </select>
             </div>
+
+            {formData.type === 'TV Series' && (
+              <div className="space-y-2">
+                <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Total Seasons</label>
+                <input 
+                  name="totalSeasons" 
+                  type="number" 
+                  min="1"
+                  value={formData.totalSeasons} 
+                  onChange={handleChange} 
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" 
+                  placeholder="e.g. 3" 
+                />
+              </div>
+            )}
+            
+            {formData.type === 'TV Series' && (
+              <div className="space-y-2">
+                <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Episodes per Season (Comma separated)</label>
+                <input 
+                  name="episodesPerSeason" 
+                  value={formData.episodesPerSeason} 
+                  onChange={handleChange} 
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" 
+                  placeholder="e.g. 12, 12, 10" 
+                />
+                <p className="text-[10px] text-brand-text/30 font-bold tracking-wider uppercase">Each number represents the episode count for that season.</p>
+              </div>
+            )}
             <div className="space-y-2">
               <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Synopsis / Description</label>
               <textarea required name="synopsis" value={formData.synopsis} onChange={handleChange} rows={4} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all resize-none placeholder:text-white/10" placeholder="Enter movie description..." />
