@@ -40,7 +40,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="text-2xl font-black tracking-tighter text-brand-accent drop-shadow-[0_0_8px_rgba(0,242,255,0.5)] cursor-pointer">
-              MOVIEHUB
+              StreamVerse
             </Link>
           </div>
 

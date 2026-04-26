@@ -19,7 +19,7 @@ function App() {
         
         <footer className="py-12 border-t border-white/5 bg-brand-bg/50 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 text-center">
-            <p className="text-brand-text/30 text-sm">© 2026 Movie Hub. All rights reserved.</p>
+            <p className="text-brand-text/30 text-sm">© 2026 StreamVerse. All rights reserved.</p>
           </div>
         </footer>
       </div>
