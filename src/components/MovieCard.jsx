@@ -2,9 +2,10 @@ import { Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const MovieCard = ({ movie }) => {
-  return (
+    const typePrefix = movie.type === 'TV Series' || movie.type === 'TV' ? 'tv' : 'movie';
+    return (
     <Link 
-      to={`/movie/${movie.id}`}
+      to={`/${typePrefix}/${movie.id}`}
       className="group relative flex flex-col bg-brand-card/30 rounded-xl sm:rounded-2xl overflow-hidden border border-white/5 transition-all duration-300 ease-out hover:scale-105 hover:shadow-[0_0_25px_rgba(0,242,255,0.25)] cursor-pointer"
     >
       {/* Poster Image */}

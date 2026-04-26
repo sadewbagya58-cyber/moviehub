@@ -127,9 +127,10 @@ const MovieDetail = () => {
   }
 
   // Server URLs based on IMDB ID
+  const typePrefix = movie?.type === 'TV Series' || movie?.type === 'TV' ? 'tv' : 'movie';
   const currentUrl = activePlayer === 'server1' 
-    ? `https://vidsrc.me/embed/movie/${movie.imdb_id}`
-    : `https://vidsrc.cc/v2/embed/movie/${movie.imdb_id}`;
+    ? `https://vidsrc.me/embed/${typePrefix}/${movie.imdb_id}`
+    : `https://vidsrc.cc/v2/embed/${typePrefix}/${movie.imdb_id}`;
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
