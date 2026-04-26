@@ -13,6 +13,9 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activePlayer, setActivePlayer] = useState('server1');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedSeason, setSelectedSeason] = useState(1);
+  const [selectedEpisode, setSelectedEpisode] = useState(1);
+  const [isDub, setIsDub] = useState(false);
   const videoRef = useRef(null);
   const plyrRef = useRef(null);
 
@@ -129,15 +132,22 @@ const MovieDetail = () => {
   // Server URLs based on IMDB ID
   const typePrefix = movie?.type === 'TV Series' || movie?.type === 'TV' ? 'tv' : 'movie';
   const isTV = typePrefix === 'tv';
+  const episodeQuery = isTV ? `&s=${selectedSeason}&e=${selectedEpisode}` : '';
+  const dubParam = isDub ? '&ds=1' : '';
   
   let currentUrl = '';
   if (activePlayer === 'server1') {
-    currentUrl = `https://vidsrc.me/embed/${typePrefix}/${movie.imdb_id}${isTV ? '&s=1&e=1' : ''}`;
+    currentUrl = `https://vidsrc.me/embed/${typePrefix}/${movie.imdb_id}${episodeQuery}${dubParam}`;
   } else if (activePlayer === 'server2') {
-    currentUrl = `https://vidsrc.cc/v2/embed/${typePrefix}/${movie.imdb_id}${isTV ? '&s=1&e=1' : ''}`;
+    currentUrl = `https://vidsrc.cc/v2/embed/${typePrefix}/${movie.imdb_id}${episodeQuery}${dubParam}`;
   } else if (activePlayer === 'server3') {
-    currentUrl = `https://multiembed.mov/?video_id=${movie.imdb_id}${isTV ? '&s=1&e=1' : ''}`;
+    currentUrl = `https://multiembed.mov/?video_id=${movie.imdb_id}${episodeQuery}${dubParam}`;
   }
+
+  const episodeCounts = movie?.episodesPerSeason 
+    ? movie.episodesPerSeason.split(',').map(n => parseInt(n.trim())) 
+    : Array(parseInt(movie?.totalSeasons || 1)).fill(12);
+  const currentSeasonEpisodeCount = episodeCounts[selectedSeason - 1] || 12;
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
@@ -236,6 +246,77 @@ const MovieDetail = () => {
                 >
                   Server 3
                 </button>
+              </div>
+
+              {/* Minimal Season/Episode & Sub/Dub Selector */}
+              <div className="bg-brand-card/10 backdrop-blur-md border border-white/5 rounded-3xl p-6 md:p-8 space-y-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-1.5 h-8 bg-brand-accent rounded-full" />
+                    <div>
+                      <h3 className="text-xl font-black text-white uppercase tracking-wider">Player Controls</h3>
+                      <p className="text-[10px] text-brand-text/40 font-bold uppercase tracking-widest">Select Season, Episode & Language</p>
+                    </div>
+                  </div>
+                  
+                  {/* Sub/Dub Toggle */}
+                  <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 self-start md:self-center">
+                    <button 
+                      onClick={() => { setIsDub(false); setIsPlaying(false); }}
+                      className={`px-6 py-2 rounded-lg text-xs font-black tracking-widest transition-all ${!isDub ? 'bg-brand-accent text-brand-bg shadow-lg' : 'text-brand-text/40 hover:text-white'}`}
+                    >
+                      SUB
+                    </button>
+                    <button 
+                      onClick={() => { setIsDub(true); setIsPlaying(false); }}
+                      className={`px-6 py-2 rounded-lg text-xs font-black tracking-widest transition-all ${isDub ? 'bg-brand-accent text-brand-bg shadow-lg' : 'text-brand-text/40 hover:text-white'}`}
+                    >
+                      DUB
+                    </button>
+                  </div>
+                </div>
+
+                {isTV && (
+                  <div className="space-y-6">
+                    {/* Compact Season Selector */}
+                    <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                      <span className="text-[10px] font-black text-brand-text/30 uppercase tracking-widest mr-2">Seasons:</span>
+                      {Array.from({ length: parseInt(movie.totalSeasons || 1) }, (_, i) => i + 1).map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => { setSelectedSeason(s); setSelectedEpisode(1); setIsPlaying(false); }}
+                          className={`flex-shrink-0 px-4 py-2 rounded-lg font-black text-xs transition-all border ${
+                            selectedSeason === s
+                              ? 'bg-brand-accent/20 border-brand-accent text-brand-accent'
+                              : 'bg-white/5 border-white/5 text-brand-text/40 hover:border-white/20'
+                          }`}
+                        >
+                          Season {s}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Compact Episode Selector */}
+                    <div className="space-y-3">
+                      <span className="text-[10px] font-black text-brand-text/30 uppercase tracking-widest">Episodes:</span>
+                      <div className="flex flex-wrap gap-2">
+                        {Array.from({ length: currentSeasonEpisodeCount }, (_, i) => i + 1).map((e) => (
+                          <button
+                            key={e}
+                            onClick={() => { setSelectedEpisode(e); setIsPlaying(true); }}
+                            className={`w-10 h-10 flex items-center justify-center rounded-lg font-black text-xs transition-all border ${
+                              selectedEpisode === e
+                                ? 'bg-brand-accent text-brand-bg border-brand-accent shadow-[0_0_15px_rgba(0,242,255,0.3)] scale-110'
+                                : 'bg-white/5 border-white/5 text-brand-text/40 hover:text-white hover:border-white/20'
+                            }`}
+                          >
+                            {e}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
  
