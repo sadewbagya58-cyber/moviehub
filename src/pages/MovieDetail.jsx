@@ -128,15 +128,15 @@ const MovieDetail = () => {
 
   // Server URLs based on IMDB ID
   const typePrefix = movie?.type === 'TV Series' || movie?.type === 'TV' ? 'tv' : 'movie';
-  const isTV = typePrefix === 'tv';
+  const imdbId = movie?.imdb_id?.trim();
   
   let currentUrl = '';
   if (activePlayer === 'server1') {
-    currentUrl = `https://vidsrc.me/embed/${typePrefix}/${movie.imdb_id}`;
+    currentUrl = `https://vidsrc.me/embed/${typePrefix}/${imdbId}`;
   } else if (activePlayer === 'server2') {
-    currentUrl = `https://vidsrc.xyz/embed/${typePrefix}/${movie.imdb_id}`;
+    currentUrl = `https://vidsrc.to/embed/${typePrefix}/${imdbId}`;
   } else if (activePlayer === 'server3') {
-    currentUrl = `https://multiembed.mov/?video_id=${movie.imdb_id}`;
+    currentUrl = `https://multiembed.mov/?video_id=${imdbId}`;
   }
 
   return (
