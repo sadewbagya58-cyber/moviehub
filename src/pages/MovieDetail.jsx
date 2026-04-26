@@ -128,9 +128,16 @@ const MovieDetail = () => {
 
   // Server URLs based on IMDB ID
   const typePrefix = movie?.type === 'TV Series' || movie?.type === 'TV' ? 'tv' : 'movie';
-  const currentUrl = activePlayer === 'server1' 
-    ? `https://vidsrc.me/embed/${typePrefix}/${movie.imdb_id}`
-    : `https://vidsrc.cc/v2/embed/${typePrefix}/${movie.imdb_id}`;
+  const isTV = typePrefix === 'tv';
+  
+  let currentUrl = '';
+  if (activePlayer === 'server1') {
+    currentUrl = `https://vidsrc.me/embed/${typePrefix}/${movie.imdb_id}${isTV ? '&s=1&e=1' : ''}`;
+  } else if (activePlayer === 'server2') {
+    currentUrl = `https://vidsrc.cc/v2/embed/${typePrefix}/${movie.imdb_id}${isTV ? '&s=1&e=1' : ''}`;
+  } else if (activePlayer === 'server3') {
+    currentUrl = `https://multiembed.mov/?video_id=${movie.imdb_id}${isTV ? '&s=1&e=1' : ''}`;
+  }
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
@@ -218,6 +225,16 @@ const MovieDetail = () => {
                   }`}
                 >
                   Server 2
+                </button>
+                <button
+                  onClick={() => { setActivePlayer('server3'); setIsPlaying(false); }}
+                  className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
+                    activePlayer === 'server3'
+                      ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
+                      : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
+                  }`}
+                >
+                  Server 3
                 </button>
               </div>
 
