@@ -1,4 +1,5 @@
 import { Play, Plus, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Hero = ({ movie }) => {
   if (!movie) return null;
@@ -51,11 +52,17 @@ const Hero = ({ movie }) => {
 
           {/* CTAs */}
           <div className="flex flex-wrap items-center gap-3 pt-4 sm:gap-4 sm:pt-6">
-            <button className="group relative flex items-center gap-2 sm:gap-3 bg-brand-accent text-brand-bg px-6 py-3 sm:px-10 sm:py-5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-lg transition-all duration-300 hover:scale-105 hover:bg-white active:scale-95 shadow-[0_0_25px_rgba(0,242,255,0.4)] hover:shadow-[0_0_40px_rgba(0,242,255,0.7)] cursor-pointer tracking-widest">
+            <Link 
+              to={`/movie/${movie.id}`}
+              className="group relative flex items-center gap-2 sm:gap-3 bg-brand-accent text-brand-bg px-6 py-3 sm:px-10 sm:py-5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-lg transition-all duration-300 hover:scale-105 hover:bg-white active:scale-95 shadow-[0_0_25px_rgba(0,242,255,0.4)] hover:shadow-[0_0_40px_rgba(0,242,255,0.7)] cursor-pointer tracking-widest"
+            >
               <Play size={18} fill="currentColor" className="sm:w-6 sm:h-6" />
               WATCH NOW
-            </button>
-            <button className="flex items-center gap-2 sm:gap-3 bg-white/5 backdrop-blur-md border border-white/20 text-white px-6 py-3 sm:px-10 sm:py-5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-lg transition-all duration-300 hover:bg-white/10 hover:border-white/40 active:scale-95 cursor-pointer tracking-widest">
+            </Link>
+            <button 
+              onClick={() => alert('Watchlist feature coming soon!')}
+              className="flex items-center gap-2 sm:gap-3 bg-white/5 backdrop-blur-md border border-white/20 text-white px-6 py-3 sm:px-10 sm:py-5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-lg transition-all duration-300 hover:bg-white/10 hover:border-white/40 active:scale-95 cursor-pointer tracking-widest"
+            >
               <Plus size={18} className="sm:w-6 sm:h-6" />
               ADD TO LIST
             </button>
