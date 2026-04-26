@@ -63,7 +63,7 @@ const Admin = () => {
           </div>
           <div>
             <h1 className="text-4xl font-black text-white tracking-tighter uppercase">Admin Panel</h1>
-            <p className="text-brand-text/40 font-bold uppercase tracking-widest text-sm">Add New Movie Content</p>
+            <p className="text-brand-text/40 font-bold uppercase tracking-widest text-sm">Add New Movie or TV Series</p>
           </div>
         </div>
 
@@ -86,6 +86,20 @@ const Admin = () => {
                   <input required name="rating" value={formData.rating} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="8.5" />
                 </div>
               </div>
+            </div>
+
+            {/* Content Type Selector */}
+            <div className="space-y-2">
+              <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Content Type</label>
+              <select 
+                name="type" 
+                value={formData.type} 
+                onChange={handleChange} 
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all cursor-pointer appearance-none"
+              >
+                <option value="Movie" className="bg-brand-bg text-white">Movie</option>
+                <option value="TV Series" className="bg-brand-bg text-white">TV Series</option>
+              </select>
             </div>
             <div className="space-y-2">
               <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Synopsis / Description</label>
@@ -155,7 +169,7 @@ const Admin = () => {
             ) : success ? (
               <><CheckCircle2 size={24} /> PUBLISHED SUCCESSFULLY!</>
             ) : (
-              <><Send size={20} /> PUBLISH MOVIE</>
+              <><Send size={20} /> PUBLISH CONTENT</>
             )}
           </button>
         </form>
