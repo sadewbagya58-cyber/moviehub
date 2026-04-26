@@ -132,9 +132,9 @@ const MovieDetail = () => {
   
   let currentUrl = '';
   if (activePlayer === 'server1') {
-    currentUrl = `https://vidsrc.me/embed/${typePrefix}/${movie.imdb_id}${isTV ? '&s=1&e=1' : ''}`;
+    currentUrl = `https://vidsrc.me/embed/${typePrefix}/${movie.imdb_id}${isTV ? '?s=1&e=1' : ''}`;
   } else if (activePlayer === 'server2') {
-    currentUrl = `https://vidsrc.cc/v2/embed/${typePrefix}/${movie.imdb_id}${isTV ? '&s=1&e=1' : ''}`;
+    currentUrl = `https://vidsrc.cc/v2/embed/${typePrefix}/${movie.imdb_id}${isTV ? '?s=1&e=1' : ''}`;
   } else if (activePlayer === 'server3') {
     currentUrl = `https://multiembed.mov/?video_id=${movie.imdb_id}${isTV ? '&s=1&e=1' : ''}`;
   }
