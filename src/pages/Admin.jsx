@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
+import { collection, addDoc, serverTimestamp, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Plus, Minus, Send, CheckCircle2, Film } from 'lucide-react';
+import { Plus, Minus, Send, CheckCircle2, Film, Edit, Trash2 } from 'lucide-react';
 
 const Admin = () => {
   const [formData, setFormData] = useState({
@@ -22,6 +22,32 @@ const Admin = () => {
   const [subInput, setSubInput] = useState({ label: '', url: '' });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [catalog, setCatalog] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+
+  useEffect(() => {
+    const q = query(collection(db, 'movies'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const movieData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setCatalog(movieData);
+    }, (err) => {
+      console.error("Firestore onSnapshot error:", err);
+      // Fallback if index isn't ready or failed
+      const qSimple = query(collection(db, 'movies'));
+      onSnapshot(qSimple, (snapshot) => {
+        const movieData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setCatalog(movieData);
+      });
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -46,26 +72,70 @@ const Admin = () => {
     setSubtitles(subtitles.filter((_, i) => i !== index));
   };
 
+  const handleEdit = (item) => {
+    setEditingId(item.id);
+    setFormData({
+      title: item.title || '',
+      year: item.year || '',
+      rating: item.rating || '',
+      synopsis: item.synopsis || '',
+      poster: item.poster || '',
+      videoUrl: item.videoUrl || '',
+      altVideoUrl: item.altVideoUrl || '',
+      imdb_id: item.imdb_id || '',
+      sub_url: item.sub_url || '',
+      type: item.type || 'Movie',
+    });
+    setGenres(item.genres && item.genres.length > 0 ? item.genres : ['']);
+    setSubtitles(item.subtitles || []);
+    setSubInput({ label: '', url: '' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id, title) => {
+    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
+      try {
+        await deleteDoc(doc(db, 'movies', id));
+      } catch (err) {
+        console.error("Error deleting movie:", err);
+        alert("Error deleting movie. Check console for details.");
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', sub_url: '', type: 'Movie' });
+    setGenres(['']);
+    setSubtitles([]);
+    setSubInput({ label: '', url: '' });
+    setEditingId(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await addDoc(collection(db, 'movies'), {
+      const payload = {
         ...formData,
         genres: genres.filter(g => g !== ''),
         subtitles: subtitles,
         sub_url: subtitles.length > 0 ? subtitles[0].url : formData.sub_url,
-        createdAt: serverTimestamp(),
-      });
+      };
+
+      if (editingId) {
+        await updateDoc(doc(db, 'movies', editingId), payload);
+      } else {
+        await addDoc(collection(db, 'movies'), {
+          ...payload,
+          createdAt: serverTimestamp(),
+        });
+      }
       setSuccess(true);
-      setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', sub_url: '', type: 'Movie' });
-      setGenres(['']);
-      setSubtitles([]);
-      setSubInput({ label: '', url: '' });
+      resetForm();
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
-      console.error("Error adding movie:", error);
-      alert("Error adding movie. Check console for details.");
+      console.error("Error saving movie:", error);
+      alert("Error saving movie. Check console for details.");
     } finally {
       setLoading(false);
     }
@@ -80,7 +150,9 @@ const Admin = () => {
           </div>
           <div>
             <h1 className="text-4xl font-black text-white tracking-tighter uppercase">Admin Panel</h1>
-            <p className="text-brand-text/40 font-bold uppercase tracking-widest text-sm">Add New Movie or TV Series</p>
+            <p className="text-brand-text/40 font-bold uppercase tracking-widest text-sm">
+              {editingId ? 'Edit Content Mode' : 'Add New Movie or TV Series'}
+            </p>
           </div>
         </div>
 
@@ -112,7 +184,7 @@ const Admin = () => {
                 name="type" 
                 value={formData.type} 
                 onChange={handleChange} 
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all cursor-pointer appearance-none"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all cursor-pointer appearance-none animate-none"
               >
                 <option value="Movie" className="bg-brand-bg text-white">Movie</option>
                 <option value="TV Series" className="bg-brand-bg text-white">TV Series</option>
@@ -190,7 +262,6 @@ const Admin = () => {
               </div>
               
               <p className="text-[10px] text-brand-text/30 font-bold tracking-wider uppercase">Player 1: Direct MP4 | Player 2: External Embeds | Player 3: Auto-generated | Subtitles: Multiple SRTs/ZIPs</p>
-
             </div>
           </div>
 
@@ -205,7 +276,7 @@ const Admin = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {genres.map((genre, index) => (
                 <div key={index} className="relative group">
-                  <input value={genre} onChange={(e) => handleGenreChange(index, e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white border focus:border-brand-accent outline-none transition-all pr-10 placeholder:text-white/10" placeholder="e.g. Sci-Fi" />
+                  <input value={genre} onChange={(e) => handleGenreChange(index, e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all pr-10 placeholder:text-white/10" placeholder="e.g. Sci-Fi" />
                   {genres.length > 1 && (
                     <button type="button" onClick={() => removeGenre(index)} className="absolute right-2 top-1/2 -translate-y-1/2 text-white/20 hover:text-red-500 transition-colors cursor-pointer">
                       <Minus size={16} />
@@ -216,19 +287,75 @@ const Admin = () => {
             </div>
           </div>
 
- 
-
-
-          <button type="submit" disabled={loading} className="w-full bg-brand-accent text-brand-bg py-6 rounded-[2rem] font-black text-lg tracking-[0.2em] hover:bg-white hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-[0_20px_40px_rgba(0,242,255,0.2)] cursor-pointer">
-            {loading ? (
-              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-brand-bg"></div>
-            ) : success ? (
-              <><CheckCircle2 size={24} /> PUBLISHED SUCCESSFULLY!</>
-            ) : (
-              <><Send size={20} /> PUBLISH CONTENT</>
+          {/* Submit Actions */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            {editingId && (
+              <button type="button" onClick={resetForm} className="w-full sm:w-1/3 bg-white/5 border border-white/10 hover:bg-white/10 text-white py-6 rounded-[2rem] font-black text-lg tracking-[0.2em] transition-all cursor-pointer">
+                CANCEL EDIT
+              </button>
             )}
-          </button>
+            <button type="submit" disabled={loading} className={`${editingId ? 'w-full sm:w-2/3' : 'w-full'} bg-brand-accent text-brand-bg py-6 rounded-[2rem] font-black text-lg tracking-[0.2em] hover:bg-white hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-[0_20px_40px_rgba(0,242,255,0.2)] cursor-pointer`}>
+              {loading ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-brand-bg"></div>
+              ) : success ? (
+                <><CheckCircle2 size={24} /> {editingId ? 'UPDATED SUCCESSFULLY!' : 'PUBLISHED SUCCESSFULLY!'}</>
+              ) : (
+                <><Send size={20} /> {editingId ? 'UPDATE CONTENT' : 'PUBLISH CONTENT'}</>
+              )}
+            </button>
+          </div>
         </form>
+
+        {/* Catalog List section */}
+        <div className="mt-16 bg-brand-card/20 backdrop-blur-xl border border-white/5 p-8 rounded-[2rem] space-y-6">
+          <div className="flex items-center justify-between border-b border-white/5 pb-4">
+            <h2 className="text-xl font-black text-white uppercase tracking-wider">Catalog Management</h2>
+            <span className="text-xs text-brand-text/40 font-bold uppercase tracking-widest">{catalog.length} items total</span>
+          </div>
+
+          <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+            {catalog.length === 0 ? (
+              <div className="text-center py-10 text-brand-text/30 font-bold uppercase tracking-widest text-sm">
+                No items in database.
+              </div>
+            ) : (
+              catalog.map((item) => (
+                <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white/5 hover:bg-white/[0.08] border border-white/5 hover:border-brand-accent/20 rounded-2xl transition-all duration-300 gap-4">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <img src={item.poster || 'https://via.placeholder.com/150'} alt={item.title} className="w-16 h-20 object-cover rounded-lg border border-white/10 shrink-0" />
+                    <div className="min-w-0">
+                      <h3 className="text-white font-black uppercase tracking-wide truncate text-base">{item.title}</h3>
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <span className="text-[10px] bg-brand-accent/15 text-brand-accent border border-brand-accent/20 px-2 py-0.5 rounded-full font-black uppercase tracking-wider">{item.type}</span>
+                        <span className="text-xs text-brand-text/40 font-bold">{item.year}</span>
+                        <span className="text-xs text-brand-text/40 font-bold">•</span>
+                        <span className="text-xs text-brand-text/40 font-bold">★ {item.rating}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                    <button 
+                      type="button" 
+                      onClick={() => handleEdit(item)} 
+                      className="flex items-center gap-1.5 bg-brand-accent/10 hover:bg-brand-accent text-brand-accent hover:text-brand-bg px-4 py-2.5 rounded-xl text-xs font-black transition-all border border-brand-accent/20 cursor-pointer"
+                    >
+                      <Edit size={14} />
+                      EDIT
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => handleDelete(item.id, item.title)} 
+                      className="flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-4 py-2.5 rounded-xl text-xs font-black transition-all border border-red-500/20 cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                      DELETE
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
