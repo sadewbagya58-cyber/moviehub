@@ -18,6 +18,8 @@ const Admin = () => {
   });
 
   const [genres, setGenres] = useState(['']);
+  const [subtitles, setSubtitles] = useState([]);
+  const [subInput, setSubInput] = useState({ label: '', url: '' });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -33,6 +35,17 @@ const Admin = () => {
     setGenres(newGenres);
   };
 
+  const handleAddSubtitle = () => {
+    if (subInput.label.trim() && subInput.url.trim()) {
+      setSubtitles([...subtitles, { label: subInput.label.trim(), url: subInput.url.trim() }]);
+      setSubInput({ label: '', url: '' });
+    }
+  };
+
+  const handleRemoveSubtitle = (index) => {
+    setSubtitles(subtitles.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -40,11 +53,15 @@ const Admin = () => {
       await addDoc(collection(db, 'movies'), {
         ...formData,
         genres: genres.filter(g => g !== ''),
+        subtitles: subtitles,
+        sub_url: subtitles.length > 0 ? subtitles[0].url : formData.sub_url,
         createdAt: serverTimestamp(),
       });
       setSuccess(true);
       setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', sub_url: '', type: 'Movie' });
       setGenres(['']);
+      setSubtitles([]);
+      setSubInput({ label: '', url: '' });
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
       console.error("Error adding movie:", error);
@@ -124,16 +141,55 @@ const Admin = () => {
                   <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Alt Video URL (Player 2)</label>
                   <input name="altVideoUrl" value={formData.altVideoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="Iframe/Drive link" />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                   <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">IMDB ID (Player 3)</label>
                   <input name="imdb_id" value={formData.imdb_id} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="tt2527336" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Subtitle URL (.srt)</label>
-                  <input name="sub_url" value={formData.sub_url} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="https://.../sub.srt" />
+              </div>
+
+              {/* Subtitles Manager */}
+              <div className="border-t border-white/5 pt-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-black text-brand-text/40 uppercase tracking-widest">Subtitles Manager</h3>
+                  <span className="text-[10px] text-brand-text/30 font-bold uppercase tracking-wider">{subtitles.length} Subtitles Added</span>
+                </div>
+                
+                {/* Temporary Subtitles List Review */}
+                {subtitles.length > 0 && (
+                  <div className="grid sm:grid-cols-2 gap-3 max-h-[200px] overflow-y-auto pr-1">
+                    {subtitles.map((sub, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-white/5 border border-white/5 rounded-xl text-sm">
+                        <div className="truncate max-w-[200px] flex flex-col">
+                          <span className="font-black text-brand-accent uppercase text-[10px]">{sub.label}</span>
+                          <span className="text-white/60 text-xs truncate">{sub.url}</span>
+                        </div>
+                        <button type="button" onClick={() => handleRemoveSubtitle(index)} className="text-white/20 hover:text-red-500 transition-colors p-1 cursor-pointer">
+                          <Minus size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Subtitle Form Inputs */}
+                <div className="grid sm:grid-cols-12 gap-3 items-end">
+                  <div className="sm:col-span-4 space-y-2">
+                    <label className="text-[10px] font-black text-brand-text/30 uppercase tracking-widest">Label</label>
+                    <input type="text" value={subInput.label} onChange={(e) => setSubInput({ ...subInput, label: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="e.g. Episode 01 or Full ZIP" />
+                  </div>
+                  <div className="sm:col-span-6 space-y-2">
+                    <label className="text-[10px] font-black text-brand-text/30 uppercase tracking-widest">SRT / ZIP URL</label>
+                    <input type="text" value={subInput.url} onChange={(e) => setSubInput({ ...subInput, url: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="https://.../sub.srt" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <button type="button" onClick={handleAddSubtitle} className="w-full bg-brand-accent/10 hover:bg-brand-accent text-brand-accent hover:text-brand-bg py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all border border-brand-accent/20 cursor-pointer">
+                      + Add
+                    </button>
+                  </div>
                 </div>
               </div>
-              <p className="text-[10px] text-brand-text/30 font-bold tracking-wider uppercase">Player 1: Direct MP4 | Player 2: External Embeds | Player 3: Auto-generated | Subtitles: Self-hosted .srt</p>
+              
+              <p className="text-[10px] text-brand-text/30 font-bold tracking-wider uppercase">Player 1: Direct MP4 | Player 2: External Embeds | Player 3: Auto-generated | Subtitles: Multiple SRTs/ZIPs</p>
 
             </div>
           </div>

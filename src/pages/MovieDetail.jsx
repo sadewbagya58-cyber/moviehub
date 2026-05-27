@@ -237,31 +237,52 @@ const MovieDetail = () => {
                   Server 3
                 </button>
               </div>
-
- 
-
-              {/* Subtitle Toolbox */}
-              {movie.sub_url && (
+               {/* Subtitle Toolbox */}
+              {((movie.subtitles && movie.subtitles.length > 0) || movie.sub_url) && (
                 <div className="bg-slate-900 md:bg-slate-900/50 md:backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-[2rem] p-6 md:p-8 space-y-6">
                   <div className="flex items-center gap-3">
                     <FileText className="text-brand-accent" size={24} />
                     <h3 className="text-xl font-black text-white uppercase tracking-wider">Subtitle Toolbox</h3>
                   </div>
-                  <div className="flex flex-wrap items-center gap-6">
-                    <a 
-                      href={movie.sub_url}
-                      download
-                      className="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white text-white hover:text-brand-bg px-8 py-4 rounded-xl font-black transition-all border border-white/10"
-                    >
-                      <Download size={20} />
-                      DOWNLOAD SRT
-                    </a>
-                    <div className="flex items-start gap-2 text-brand-text/60 max-w-md">
-                      <Info size={18} className="text-brand-accent shrink-0 mt-0.5" />
-                      <p className="text-sm font-medium leading-relaxed">
-                        Download the SRT file, then click the CC/Settings icon in the player and select <span className="text-white font-bold">"Upload/Custom Subtitle"</span> to load it.
-                      </p>
+                  
+                  {movie.subtitles && movie.subtitles.length > 0 ? (
+                    <div className="grid sm:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                      {movie.subtitles.map((sub, index) => (
+                        <div key={index} className="flex items-center justify-between p-4 bg-white/5 border border-white/5 hover:border-brand-accent/30 rounded-xl transition-all duration-300">
+                          <span className="text-sm font-bold text-white tracking-wide truncate max-w-[180px]">{sub.label}</span>
+                          <a 
+                            href={sub.url}
+                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-1.5 bg-brand-accent/10 hover:bg-brand-accent text-brand-accent hover:text-brand-bg px-4 py-2.5 rounded-lg text-xs font-black transition-all border border-brand-accent/20 hover:scale-105"
+                          >
+                            <Download size={14} />
+                            DOWNLOAD
+                          </a>
+                        </div>
+                      ))}
                     </div>
+                  ) : (
+                    <div className="flex flex-wrap items-center gap-6">
+                      <a 
+                        href={movie.sub_url}
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white text-white hover:text-brand-bg px-8 py-4 rounded-xl font-black transition-all border border-white/10"
+                      >
+                        <Download size={20} />
+                        DOWNLOAD SRT
+                      </a>
+                    </div>
+                  )}
+
+                  <div className="flex items-start gap-2 text-brand-text/60 max-w-xl">
+                    <Info size={18} className="text-brand-accent shrink-0 mt-0.5" />
+                    <p className="text-sm font-medium leading-relaxed">
+                      Download the appropriate subtitle file, then click the CC/Settings icon in the player and select <span className="text-white font-bold">"Upload/Custom Subtitle"</span> to load it.
+                    </p>
                   </div>
                 </div>
               )}
