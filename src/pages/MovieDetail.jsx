@@ -242,7 +242,7 @@ const MovieDetail = () => {
 
               {/* Subtitle Toolbox */}
               {movie.sub_url && (
-                <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-[2rem] p-6 md:p-8 space-y-6">
+                <div className="bg-slate-900 md:bg-slate-900/50 md:backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-[2rem] p-6 md:p-8 space-y-6">
                   <div className="flex items-center gap-3">
                     <FileText className="text-brand-accent" size={24} />
                     <h3 className="text-xl font-black text-white uppercase tracking-wider">Subtitle Toolbox</h3>
@@ -284,7 +284,7 @@ const MovieDetail = () => {
 
               <div className="flex flex-wrap gap-2">
                 {movie.genres && movie.genres.map(genre => (
-                  <span key={genre} className="bg-white/5 backdrop-blur-sm text-brand-text/80 border border-white/10 px-5 py-2 rounded-full text-[10px] font-black tracking-[0.2em] uppercase">
+                  <span key={genre} className="bg-white/5 md:backdrop-blur-sm text-brand-text/80 border border-white/10 px-5 py-2 rounded-full text-[10px] font-black tracking-[0.2em] uppercase">
                     {genre}
                   </span>
                 ))}
@@ -305,7 +305,7 @@ const MovieDetail = () => {
           {/* Right: Server & Alternate Downloads */}
           <div className="lg:col-span-4 space-y-10">
             {/* Server Selection */}
-            <div className="bg-brand-card/20 backdrop-blur-xl border border-white/10 rounded-2xl lg:rounded-[2rem] p-6 md:p-8 space-y-6">
+            <div className="bg-brand-card/90 md:bg-brand-card/20 md:backdrop-blur-xl border border-white/10 rounded-2xl lg:rounded-[2rem] p-6 md:p-8 space-y-6">
               <h3 className="text-xl font-black text-white tracking-tight flex items-center gap-3">
                 <Cpu size={22} className="text-brand-accent" />
                 Select Server

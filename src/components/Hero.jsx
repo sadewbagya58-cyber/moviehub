@@ -33,7 +33,7 @@ const Hero = ({ movie }) => {
             <span className="text-brand-text/60 font-black ml-1 sm:ml-2 text-sm sm:text-lg">{movie.year}</span>
             <div className="flex gap-1.5 sm:gap-2 ml-2 sm:ml-4">
               {movie.genres && movie.genres.slice(0, 2).map((genre) => (
-                <span key={genre} className="text-brand-text/80 text-[8px] sm:text-[10px] font-black tracking-widest uppercase bg-white/10 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full border border-white/10 backdrop-blur-md">
+                <span key={genre} className="text-brand-text/80 text-[8px] sm:text-[10px] font-black tracking-widest uppercase bg-white/10 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full border border-white/10 md:backdrop-blur-md">
                   {genre}
                 </span>
               ))}
@@ -66,7 +66,7 @@ const Hero = ({ movie }) => {
             })()}
             <button 
               onClick={() => alert('Watchlist feature coming soon!')}
-              className="flex items-center gap-2 sm:gap-3 bg-white/5 backdrop-blur-md border border-white/20 text-white px-6 py-3 sm:px-10 sm:py-5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-lg transition-all duration-300 hover:bg-white/10 hover:border-white/40 active:scale-95 cursor-pointer tracking-widest"
+              className="flex items-center gap-2 sm:gap-3 bg-white/5 md:backdrop-blur-md border border-white/20 text-white px-6 py-3 sm:px-10 sm:py-5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-lg transition-all duration-300 hover:bg-white/10 hover:border-white/40 active:scale-95 cursor-pointer tracking-widest"
             >
               <Plus size={18} className="sm:w-6 sm:h-6" />
               ADD TO LIST

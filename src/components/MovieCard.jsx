@@ -6,17 +6,18 @@ const MovieCard = ({ movie }) => {
     return (
     <Link 
       to={`/${typePrefix}/${movie.id}`}
-      className="group relative flex flex-col bg-brand-card/30 rounded-xl sm:rounded-2xl overflow-hidden border border-white/5 transition-all duration-300 ease-out hover:scale-105 hover:shadow-[0_0_25px_rgba(0,242,255,0.25)] cursor-pointer"
+      className="group relative flex flex-col bg-brand-card/30 rounded-xl sm:rounded-2xl overflow-hidden border border-white/5 transition-all duration-300 ease-out md:hover:scale-105 md:hover:shadow-[0_0_25px_rgba(0,242,255,0.25)] cursor-pointer"
     >
       {/* Poster Image */}
       <div className="relative aspect-[2/3] overflow-hidden">
         <img 
           src={movie.poster} 
           alt={movie.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-500 md:group-hover:scale-110"
         />
         {/* Rating Overlay */}
-        <div className="absolute top-1 right-1 sm:top-3 sm:right-3 bg-brand-bg/80 backdrop-blur-md px-1 py-0.5 sm:px-2 sm:py-1 rounded-md sm:rounded-lg flex items-center gap-0.5 sm:gap-1 border border-white/10 shadow-lg">
+        <div className="absolute top-1 right-1 sm:top-3 sm:right-3 bg-brand-bg md:bg-brand-bg/80 md:backdrop-blur-md px-1 py-0.5 sm:px-2 sm:py-1 rounded-md sm:rounded-lg flex items-center gap-0.5 sm:gap-1 border border-white/10 shadow-lg">
           <Star fill="#fac015" className="w-2 h-2 sm:w-3 sm:h-3 text-yellow-400" />
           <span className="text-[8px] sm:text-xs font-bold text-white">{movie.rating}</span>
         </div>
