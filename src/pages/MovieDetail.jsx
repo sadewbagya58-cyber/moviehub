@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Star, ArrowLeft, Download, ShieldCheck, Cpu, ExternalLink, FileText, Info } from 'lucide-react';
+import { Star, ArrowLeft, Download, ExternalLink, FileText, Info } from 'lucide-react';
 import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
 
@@ -135,8 +135,6 @@ const MovieDetail = () => {
     currentUrl = `https://vidsrc.me/embed/${typePrefix}/${imdbId}`;
   } else if (activePlayer === 'server2') {
     currentUrl = `https://vidsrc.to/embed/${typePrefix}/${imdbId}`;
-  } else if (activePlayer === 'server3') {
-    currentUrl = `https://multiembed.mov/?video_id=${imdbId}`;
   }
 
   return (
@@ -161,9 +159,9 @@ const MovieDetail = () => {
           <span className="font-bold tracking-tight">Return to Home</span>
         </Link>
 
-        <div className="grid lg:grid-cols-12 gap-12">
-          {/* Left: Video Player Section */}
-          <div className="lg:col-span-8 space-y-10">
+        <div className="max-w-5xl mx-auto w-full">
+          {/* Video Player Section */}
+          <div className="space-y-10">
             {/* 16:9 Video Player Container and Controls */}
             <div className="flex flex-col gap-6 md:gap-8 w-full">
               {/* Outer 16:9 box — #000 bg hides any white edge lines */}
@@ -225,16 +223,6 @@ const MovieDetail = () => {
                   }`}
                 >
                   Server 2
-                </button>
-                <button
-                  onClick={() => { setActivePlayer('server3'); setIsPlaying(false); }}
-                  className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
-                    activePlayer === 'server3'
-                      ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
-                      : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
-                  }`}
-                >
-                  Server 3
                 </button>
               </div>
                {/* Subtitle Toolbox */}
@@ -321,26 +309,6 @@ const MovieDetail = () => {
                 </p>
               </div>
             </div>
-          </div>
-
-          {/* Right: Server & Alternate Downloads */}
-          <div className="lg:col-span-4 space-y-10">
-            {/* Server Selection */}
-            <div className="bg-brand-card/90 md:bg-brand-card/20 md:backdrop-blur-xl border border-white/10 rounded-2xl lg:rounded-[2rem] p-6 md:p-8 space-y-6">
-              <h3 className="text-xl font-black text-white tracking-tight flex items-center gap-3">
-                <Cpu size={22} className="text-brand-accent" />
-                Select Server
-              </h3>
-              <div className="grid gap-3">
-                {['StreamWish (Primary)', 'Cloud Mirror', 'High Performance Mirror'].map((server, i) => (
-                  <button key={server} className={`w-full py-4 px-6 rounded-2xl border transition-all duration-300 font-bold text-sm tracking-tight text-left flex items-center justify-between group cursor-pointer ${i === 0 ? 'bg-brand-accent text-brand-bg border-brand-accent shadow-[0_10px_20px_rgba(0,242,255,0.1)]' : 'bg-white/5 text-white/40 border-white/5 hover:border-brand-accent/50 hover:text-white'}`}>
-                    <span>{server}</span>
-                    <ShieldCheck size={18} className={i === 0 ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 transition-opacity'} />
-                  </button>
-                ))}
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
