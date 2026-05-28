@@ -13,6 +13,8 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activePlayer, setActivePlayer] = useState('server1');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentSeason, setCurrentSeason] = useState(1);
+  const [currentEpisode, setCurrentEpisode] = useState(1);
   const videoRef = useRef(null);
   const plyrRef = useRef(null);
 
@@ -134,7 +136,17 @@ const MovieDetail = () => {
   if (activePlayer === 'server1') {
     currentUrl = `https://vidsrc.me/embed/${typePrefix}/${imdbId}`;
   } else if (activePlayer === 'server2') {
-    currentUrl = `https://vidsrc.to/embed/${typePrefix}/${imdbId}`;
+    const isAnime = movie?.genres?.includes('Animation');
+    const isTV = movie?.type === 'TV Series' || movie?.type === 'TV';
+    if (isAnime && isTV) {
+      currentUrl = movie?.altVideoUrl 
+        ? formatEmbedUrl(movie.altVideoUrl) 
+        : `https://vidsrc.cc/v2/embed/tv/${imdbId}/${currentSeason}/${currentEpisode}`;
+    } else {
+      currentUrl = movie?.altVideoUrl 
+        ? formatEmbedUrl(movie.altVideoUrl) 
+        : `https://vidsrc.to/embed/${typePrefix}/${imdbId}`;
+    }
   }
 
   return (
@@ -190,6 +202,7 @@ const MovieDetail = () => {
                         allow="autoplay; encrypted-media"
                         title={movie.title}
                         referrerPolicy="origin"
+                        key={currentUrl}
                       />
                   </div>
                 ) : (
@@ -201,6 +214,58 @@ const MovieDetail = () => {
                   </div>
                 )}
               </div>
+
+              {/* Season & Episode Selector for Anime TV Series */}
+              {activePlayer === 'server2' && (movie?.type === 'TV Series' || movie?.type === 'TV') && movie?.genres?.includes('Animation') && (
+                <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-wrap items-center justify-between gap-6 shadow-xl">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-black text-brand-accent uppercase tracking-widest">Anime Streaming Settings</span>
+                    <span className="text-[10px] text-brand-text/40 font-bold uppercase mt-1">Japanese Audio + Eng Sub</span>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-bold text-white/60">Season</span>
+                      <div className="flex items-center bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+                        <button 
+                          type="button"
+                          onClick={() => setCurrentSeason(prev => Math.max(1, prev - 1))}
+                          className="px-3 py-1.5 hover:bg-white/10 text-white font-bold transition-all cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <span className="px-4 font-black text-brand-accent min-w-[24px] text-center">{currentSeason}</span>
+                        <button 
+                          type="button"
+                          onClick={() => setCurrentSeason(prev => prev + 1)}
+                          className="px-3 py-1.5 hover:bg-white/10 text-white font-bold transition-all cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-bold text-white/60">Episode</span>
+                      <div className="flex items-center bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+                        <button 
+                          type="button"
+                          onClick={() => setCurrentEpisode(prev => Math.max(1, prev - 1))}
+                          className="px-3 py-1.5 hover:bg-white/10 text-white font-bold transition-all cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <span className="px-4 font-black text-brand-accent min-w-[32px] text-center">{currentEpisode}</span>
+                        <button 
+                          type="button"
+                          onClick={() => setCurrentEpisode(prev => prev + 1)}
+                          className="px-3 py-1.5 hover:bg-white/10 text-white font-bold transition-all cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Player Selection Tabs */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
