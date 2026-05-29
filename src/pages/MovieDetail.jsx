@@ -12,6 +12,7 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activePlayer, setActivePlayer] = useState('server1');
+  const [audioMode, setAudioMode] = useState('sub');
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSeason, setCurrentSeason] = useState(1);
   const [currentEpisode, setCurrentEpisode] = useState(1);
@@ -139,12 +140,17 @@ const MovieDetail = () => {
     const isAnime = movie?.genres?.includes('Animation');
     const isTV = movie?.type === 'TV Series' || movie?.type === 'TV';
     if (isAnime && isTV) {
-      currentUrl = movie?.altVideoUrl 
-        ? formatEmbedUrl(movie.altVideoUrl) 
-        : `https://vidsrc.cc/v2/embed/tv/${imdbId}/${currentSeason}/${currentEpisode}`;
+      if (audioMode === 'sub' && movie?.mal_id) {
+        currentUrl = `https://vidsrc.cc/v2/embed/tv/${movie.mal_id}/${currentSeason}/${currentEpisode}`;
+      } else {
+        // Dub mode or missing MAL ID falls back to IMDb based URL
+        currentUrl = movie?.altVideoUrl
+          ? formatEmbedUrl(movie.altVideoUrl)
+          : `https://vidsrc.cc/v2/embed/tv/${imdbId}/${currentSeason}/${currentEpisode}`;
+      }
     } else {
-      currentUrl = movie?.altVideoUrl 
-        ? formatEmbedUrl(movie.altVideoUrl) 
+      currentUrl = movie?.altVideoUrl
+        ? formatEmbedUrl(movie.altVideoUrl)
         : `https://vidsrc.to/embed/${typePrefix}/${imdbId}`;
     }
   }
@@ -290,7 +296,23 @@ const MovieDetail = () => {
                   Server 2
                 </button>
               </div>
-               {/* Subtitle Toolbox */}
+                {/* Sub/Dub Toggle for Anime */}
+                {movie?.genres?.includes('Animation') && (movie?.type === 'TV Series' || movie?.type === 'TV') && (
+                  <div className="flex items-center gap-2 mt-4">
+                    <span className="text-xs font-black text-brand-text/40 uppercase">Audio Mode:</span>
+                    <button
+                      type="button"
+                      onClick={() => setAudioMode('sub')}
+                      className={`px-3 py-1 rounded ${audioMode==='sub' ? 'bg-brand-accent text-brand-bg' : 'bg-white/5 text-brand-text/60'}`}
+                    >🇯🇵 Sub</button>
+                    <button
+                      type="button"
+                      onClick={() => setAudioMode('dub')}
+                      className={`px-3 py-1 rounded ${audioMode==='dub' ? 'bg-brand-accent text-brand-bg' : 'bg-white/5 text-brand-text/60'}`}
+                    >🇬🇧 Dub</button>
+                  </div>
+                )}
+               {/* Subtitle Toolbox */}
               {((movie.subtitles && movie.subtitles.length > 0) || movie.sub_url) && (
                 <div className="bg-slate-900 md:bg-slate-900/50 md:backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-[2rem] p-6 md:p-8 space-y-6">
                   <div className="flex items-center gap-3">

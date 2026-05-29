@@ -13,6 +13,7 @@ const Admin = () => {
     videoUrl: '',
     altVideoUrl: '',
     imdb_id: '',
+    mal_id: '',
     sub_url: '',
     type: 'Movie',
   });
@@ -83,6 +84,7 @@ const Admin = () => {
       videoUrl: item.videoUrl || '',
       altVideoUrl: item.altVideoUrl || '',
       imdb_id: item.imdb_id || '',
+      mal_id: item.mal_id || '',
       sub_url: item.sub_url || '',
       type: item.type || 'Movie',
     });
@@ -104,7 +106,7 @@ const Admin = () => {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', sub_url: '', type: 'Movie' });
+    setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', mal_id: '', sub_url: '', type: 'Movie' });
     setGenres(['']);
     setSubtitles([]);
     setSubInput({ label: '', url: '' });
@@ -213,9 +215,13 @@ const Admin = () => {
                   <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Server 2 Custom URL (Optional)</label>
                   <input name="altVideoUrl" value={formData.altVideoUrl} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="Custom Server 2 link (e.g. iframe / Drive)" />
                 </div>
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2">
                   <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">IMDB ID (Player 3)</label>
                   <input name="imdb_id" value={formData.imdb_id} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="tt2527336" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">MyAnimeList (MAL) ID</label>
+                  <input name="mal_id" value={formData.mal_id} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="e.g. 5114" />
                 </div>
               </div>
 
