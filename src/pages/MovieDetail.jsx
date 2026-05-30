@@ -155,17 +155,8 @@ const MovieDetail = () => {
     }
   }
 
-  const cleanImdbId = movie?.imdb_id ? movie.imdb_id.trim() : '';
-  let rawOverrideUrl = movie?.download_override_url ? movie.download_override_url.trim() : '';
-  if (rawOverrideUrl && !rawOverrideUrl.startsWith('http://') && !rawOverrideUrl.startsWith('https://')) {
-    rawOverrideUrl = `https://${rawOverrideUrl}`;
-  }
-  const downloadUrl = rawOverrideUrl || (
-    (movie?.type === 'movie' || movie?.type === 'Movie')
-      ? `https://multiembed.to/download.php?video_id=${cleanImdbId}`
-      : `https://multiembed.to/download.php?video_id=${cleanImdbId}&s=${currentSeason || 1}&e=${currentEpisode || 1}`
-  );
-  const hasDownload = !!(rawOverrideUrl || cleanImdbId);
+  const downloadUrl = movie?.download_override_url ? movie.download_override_url.trim() : '';
+  const hasDownload = !!downloadUrl;
   const isMovie = !(movie?.type === 'TV Series' || movie?.type === 'TV');
 
   return (
