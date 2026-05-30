@@ -155,13 +155,18 @@ const MovieDetail = () => {
     }
   }
 
-  const isMovie = typePrefix === 'movie';
-  const hasDownload = !!(movie?.download_override_url?.trim() || imdbId);
-  const downloadUrl = movie?.download_override_url?.trim() || (
-    isMovie
-      ? `https://multiembed.to/download.php?video_id=${imdbId}`
-      : `https://multiembed.to/download.php?video_id=${imdbId}&s=${currentSeason || 1}&e=${currentEpisode || 1}`
+  const cleanImdbId = movie?.imdb_id ? movie.imdb_id.trim() : '';
+  let rawOverrideUrl = movie?.download_override_url ? movie.download_override_url.trim() : '';
+  if (rawOverrideUrl && !rawOverrideUrl.startsWith('http://') && !rawOverrideUrl.startsWith('https://')) {
+    rawOverrideUrl = `https://${rawOverrideUrl}`;
+  }
+  const downloadUrl = rawOverrideUrl || (
+    (movie?.type === 'movie' || movie?.type === 'Movie')
+      ? `https://multiembed.to/download.php?video_id=${cleanImdbId}`
+      : `https://multiembed.to/download.php?video_id=${cleanImdbId}&s=${currentSeason || 1}&e=${currentEpisode || 1}`
   );
+  const hasDownload = !!(rawOverrideUrl || cleanImdbId);
+  const isMovie = !(movie?.type === 'TV Series' || movie?.type === 'TV');
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
