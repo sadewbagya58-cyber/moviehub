@@ -16,6 +16,7 @@ const Admin = () => {
     mal_id: '',
     sub_url: '',
     type: 'Movie',
+    download_override_url: '',
   });
 
   const [genres, setGenres] = useState(['']);
@@ -87,6 +88,7 @@ const Admin = () => {
       mal_id: item.mal_id || '',
       sub_url: item.sub_url || '',
       type: item.type || 'Movie',
+      download_override_url: item.download_override_url || '',
     });
     setGenres(item.genres && item.genres.length > 0 ? item.genres : ['']);
     setSubtitles(item.subtitles || []);
@@ -106,7 +108,7 @@ const Admin = () => {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', mal_id: '', sub_url: '', type: 'Movie' });
+    setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', mal_id: '', sub_url: '', type: 'Movie', download_override_url: '' });
     setGenres(['']);
     setSubtitles([]);
     setSubInput({ label: '', url: '' });
@@ -222,6 +224,10 @@ const Admin = () => {
                 <div className="space-y-2">
                   <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">MyAnimeList (MAL) ID</label>
                   <input name="mal_id" value={formData.mal_id} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="e.g. 5114" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Download URL Override (Optional)</label>
+                  <input name="download_override_url" value={formData.download_override_url} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="https://... (Direct override link for downloads)" />
                 </div>
               </div>
 

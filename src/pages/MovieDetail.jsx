@@ -155,6 +155,14 @@ const MovieDetail = () => {
     }
   }
 
+  const isMovie = typePrefix === 'movie';
+  const hasDownload = !!(movie?.download_override_url?.trim() || imdbId);
+  const downloadUrl = movie?.download_override_url?.trim() || (
+    isMovie
+      ? `https://multiembed.to/download.php?video_id=${imdbId}`
+      : `https://multiembed.to/download.php?video_id=${imdbId}&s=${currentSeason || 1}&e=${currentEpisode || 1}`
+  );
+
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
       {/* Blurred Background Hero */}
@@ -312,6 +320,25 @@ const MovieDetail = () => {
                     >🇬🇧 Dub</button>
                   </div>
                 )}
+
+                {/* Premium Download Button */}
+                {hasDownload ? (
+                  <a
+                    href={downloadUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-3 py-5 px-8 rounded-2xl font-black text-lg uppercase tracking-wider transition-all duration-300 border-2 border-brand-accent bg-gradient-to-r from-[#0a0d24] via-[#120d2b] to-[#0a0d24] shadow-[0_0_20px_rgba(0,242,255,0.2)] hover:shadow-[0_0_35px_rgba(0,242,255,0.45)] hover:scale-[1.01] active:scale-[0.99] text-white hover:from-[#00f2ff]/20 hover:via-[#8b5cf6]/20 hover:to-[#00f2ff]/20 hover:border-brand-accent cursor-pointer text-center"
+                  >
+                    📥 Download {isMovie ? 'Movie' : `Episode ${currentEpisode || 1}`}
+                  </a>
+                ) : (
+                  <div
+                    className="w-full flex items-center justify-center gap-3 py-5 px-8 rounded-2xl font-black text-lg uppercase tracking-wider border-2 border-white/5 bg-white/5 text-brand-text/20 text-center select-none"
+                  >
+                    📥 Download Unavailable
+                  </div>
+                )}
+
                {/* Subtitle Toolbox */}
               {((movie.subtitles && movie.subtitles.length > 0) || movie.sub_url) && (
                 <div className="bg-slate-900 md:bg-slate-900/50 md:backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-[2rem] p-6 md:p-8 space-y-6">
