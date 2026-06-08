@@ -65,7 +65,7 @@ const MovieDetail = () => {
     const isTV = movie?.type?.toLowerCase() === 'tv series' || movie?.type?.toLowerCase() === 'tv';
     if (!isTV) return;
 
-    const tmdbId = movie?.tmdb_id?.trim();
+    const tmdbId = movie?.tmdb_id ? String(movie.tmdb_id).trim() : '';
     if (!tmdbId) {
       // No TMDB ID: fall back to seasons_data map or totalSeasons field
       const seasonsData = movie?.seasons_data || {};
@@ -86,15 +86,16 @@ const MovieDetail = () => {
         const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_KEY}`);
         if (res.ok) {
           const data = await res.json();
-          const realSeasons = (data.seasons || [])
-            .filter(s => s.season_number > 0)
-            .map(s => s.season_number)
-            .sort((a, b) => a - b);
-          setSeasonsList(realSeasons.length > 0 ? realSeasons : [1]);
+          const validSeasons = data.seasons.filter(s => s.season_number > 0);
+          const list = validSeasons.map(s => s.season_number);
+          setSeasonsList(list);
         } else {
+          const error = new Error(`Failed to fetch seasons (Status: ${res.status})`);
+          console.error("TMDB Fetch Error:", error);
           setSeasonsList([1]);
         }
-      } catch {
+      } catch (error) {
+        console.error("TMDB Fetch Error:", error);
         setSeasonsList([1]);
       } finally {
         setTmdbLoading(false);
@@ -109,7 +110,7 @@ const MovieDetail = () => {
     const isTV = movie?.type?.toLowerCase() === 'tv series' || movie?.type?.toLowerCase() === 'tv';
     if (!isTV) return;
 
-    const tmdbId = movie?.tmdb_id?.trim();
+    const tmdbId = movie?.tmdb_id ? String(movie.tmdb_id).trim() : '';
     if (!tmdbId) {
       // Fall back to stored seasons_data map
       const seasonsData = movie?.seasons_data || {};
@@ -128,12 +129,15 @@ const MovieDetail = () => {
         const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${currentSeason}?api_key=${TMDB_KEY}`);
         if (res.ok) {
           const data = await res.json();
-          const count = Array.isArray(data.episodes) ? data.episodes.length : 12;
-          setTotalEpisodes(count > 0 ? count : 12);
+          const actualEpisodeCount = data.episodes ? data.episodes.length : 12;
+          setTotalEpisodes(actualEpisodeCount);
         } else {
+          const error = new Error(`Failed to fetch episodes (Status: ${res.status})`);
+          console.error("TMDB Fetch Error:", error);
           setTotalEpisodes(12);
         }
-      } catch {
+      } catch (error) {
+        console.error("TMDB Fetch Error:", error);
         setTotalEpisodes(12);
       }
     };
