@@ -16,8 +16,14 @@ const MovieDetail = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSeason, setCurrentSeason] = useState(1);
   const [currentEpisode, setCurrentEpisode] = useState(1);
+  // TMDB dynamic data
+  const [seasonsList, setSeasonsList] = useState([]);
+  const [totalEpisodes, setTotalEpisodes] = useState(12);
+  const [tmdbLoading, setTmdbLoading] = useState(false);
   const videoRef = useRef(null);
   const plyrRef = useRef(null);
+
+  const TMDB_KEY = '456bcfcf858f276686a6042cb3a650d3';
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -52,6 +58,87 @@ const MovieDetail = () => {
       }
     };
   }, [movie, activePlayer, isPlaying]);
+
+  // TMDB: Fetch total number of seasons when a TV series loads
+  useEffect(() => {
+    if (!movie) return;
+    const isTV = movie?.type?.toLowerCase() === 'tv series' || movie?.type?.toLowerCase() === 'tv';
+    if (!isTV) return;
+
+    const tmdbId = movie?.tmdb_id?.trim();
+    if (!tmdbId) {
+      // No TMDB ID: fall back to seasons_data map or totalSeasons field
+      const seasonsData = movie?.seasons_data || {};
+      if (Object.keys(seasonsData).length > 0) {
+        setSeasonsList(Object.keys(seasonsData).map(Number).sort((a, b) => a - b));
+      } else if (movie?.totalSeasons) {
+        const n = parseInt(movie.totalSeasons) || 1;
+        setSeasonsList(Array.from({ length: n }, (_, i) => i + 1));
+      } else {
+        setSeasonsList([1]);
+      }
+      return;
+    }
+
+    const fetchSeasons = async () => {
+      setTmdbLoading(true);
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_KEY}`);
+        if (res.ok) {
+          const data = await res.json();
+          const realSeasons = (data.seasons || [])
+            .filter(s => s.season_number > 0)
+            .map(s => s.season_number)
+            .sort((a, b) => a - b);
+          setSeasonsList(realSeasons.length > 0 ? realSeasons : [1]);
+        } else {
+          setSeasonsList([1]);
+        }
+      } catch {
+        setSeasonsList([1]);
+      } finally {
+        setTmdbLoading(false);
+      }
+    };
+    fetchSeasons();
+  }, [movie]);
+
+  // TMDB: Fetch episode count whenever user switches season
+  useEffect(() => {
+    if (!movie) return;
+    const isTV = movie?.type?.toLowerCase() === 'tv series' || movie?.type?.toLowerCase() === 'tv';
+    if (!isTV) return;
+
+    const tmdbId = movie?.tmdb_id?.trim();
+    if (!tmdbId) {
+      // Fall back to stored seasons_data map
+      const seasonsData = movie?.seasons_data || {};
+      if (seasonsData[currentSeason]) {
+        setTotalEpisodes(parseInt(seasonsData[currentSeason]) || 12);
+      } else if (movie?.episodesPerSeason) {
+        setTotalEpisodes(parseInt(movie.episodesPerSeason) || 12);
+      } else {
+        setTotalEpisodes(12);
+      }
+      return;
+    }
+
+    const fetchEpisodes = async () => {
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${currentSeason}?api_key=${TMDB_KEY}`);
+        if (res.ok) {
+          const data = await res.json();
+          const count = Array.isArray(data.episodes) ? data.episodes.length : 12;
+          setTotalEpisodes(count > 0 ? count : 12);
+        } else {
+          setTotalEpisodes(12);
+        }
+      } catch {
+        setTotalEpisodes(12);
+      }
+    };
+    fetchEpisodes();
+  }, [movie, currentSeason]);
 
   // Detect if URL needs iframe (Google Drive, YouTube, StreamWish, etc.)
   const isEmbedSource = (url) => {
@@ -134,24 +221,6 @@ const MovieDetail = () => {
   const isMovie = !isTV;
   const typePrefix = isTV ? 'tv' : 'movie';
   const imdbId = movie?.imdb_id?.trim();
-
-  // Dynamic Season & Episode count logic based on seasons_data map or local fallback
-  const seasonsData = movie?.seasons_data || {};
-  let seasonsList = [];
-  if (Object.keys(seasonsData).length > 0) {
-    seasonsList = Object.keys(seasonsData).map(Number).sort((a, b) => a - b);
-  } else if (movie?.totalSeasons) {
-    seasonsList = Array.from({ length: parseInt(movie.totalSeasons) || 1 }, (_, i) => i + 1);
-  } else {
-    seasonsList = [1, 2, 3, 4, 5];
-  }
-
-  let totalEpisodes = 24;
-  if (seasonsData[currentSeason]) {
-    totalEpisodes = seasonsData[currentSeason];
-  } else if (movie?.episodesPerSeason) {
-    totalEpisodes = parseInt(movie.episodesPerSeason) || 24;
-  }
   
   let currentUrl = '';
   if (activePlayer === 'server1') {
@@ -267,23 +336,30 @@ const MovieDetail = () => {
                     <div className="flex items-center gap-3 overflow-x-auto scrollbar-none py-1">
                       <span className="text-xs font-black text-white/40 uppercase tracking-widest shrink-0">Seasons</span>
                       <div className="flex gap-2">
-                        {seasonsList.map((seasonNum) => (
-                          <button
-                            key={seasonNum}
-                            type="button"
-                            onClick={() => {
-                              setCurrentSeason(seasonNum);
-                              setCurrentEpisode(1); // Reset episode when season changes
-                            }}
-                            className={`px-4 py-2 rounded-xl text-xs font-black tracking-wider transition-all duration-300 border ${
-                              currentSeason === seasonNum
-                                ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_15px_rgba(0,242,255,0.25)]'
-                                : 'bg-white/5 border-white/5 text-brand-text/60 hover:text-white hover:border-white/20'
-                            }`}
-                          >
-                            S{seasonNum}
-                          </button>
-                        ))}
+                        {tmdbLoading ? (
+                          // Skeleton tabs while fetching
+                          [1, 2, 3].map(n => (
+                            <div key={n} className="px-4 py-2 rounded-xl bg-white/5 border border-white/5 animate-pulse w-10 h-8" />
+                          ))
+                        ) : (
+                          seasonsList.map((seasonNum) => (
+                            <button
+                              key={seasonNum}
+                              type="button"
+                              onClick={() => {
+                                setCurrentSeason(seasonNum);
+                                setCurrentEpisode(1);
+                              }}
+                              className={`px-4 py-2 rounded-xl text-xs font-black tracking-wider transition-all duration-300 border ${
+                                currentSeason === seasonNum
+                                  ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_15px_rgba(0,242,255,0.25)]'
+                                  : 'bg-white/5 border-white/5 text-brand-text/60 hover:text-white hover:border-white/20'
+                              }`}
+                            >
+                              S{seasonNum}
+                            </button>
+                          ))
+                        )}
                       </div>
                     </div>
                   </div>
@@ -292,9 +368,14 @@ const MovieDetail = () => {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Episodes</span>
-                      <span className="text-[10px] text-brand-accent font-bold uppercase tracking-wider">
-                        Season {currentSeason} • Episode {currentEpisode}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-brand-accent font-bold uppercase tracking-wider">
+                          Season {currentSeason} &bull; Episode {currentEpisode}
+                        </span>
+                        {movie?.tmdb_id && (
+                          <span className="text-[9px] bg-brand-accent/10 text-brand-accent border border-brand-accent/20 px-2 py-0.5 rounded-full font-black uppercase tracking-wider">TMDB Live</span>
+                        )}
+                      </div>
                     </div>
                     
                     <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-3 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
