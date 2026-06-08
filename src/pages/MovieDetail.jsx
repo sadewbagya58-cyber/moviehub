@@ -130,15 +130,22 @@ const MovieDetail = () => {
   }
 
   // Server URLs based on IMDB ID
-  const typePrefix = movie?.type === 'TV Series' || movie?.type === 'TV' ? 'tv' : 'movie';
+  const isTV = movie?.type?.toLowerCase() === 'tv series' || movie?.type?.toLowerCase() === 'tv';
+  const isMovie = !isTV;
+  const typePrefix = isTV ? 'tv' : 'movie';
   const imdbId = movie?.imdb_id?.trim();
   
   let currentUrl = '';
   if (activePlayer === 'server1') {
-    currentUrl = `https://vidsrc.me/embed/${typePrefix}/${imdbId}`;
+    if (imdbId) {
+      if (isTV) {
+        currentUrl = `https://vsembed.ru/embed/tv/${imdbId}/${currentSeason || 1}/${currentEpisode || 1}`;
+      } else {
+        currentUrl = `https://vsembed.ru/embed/movie/${imdbId}`;
+      }
+    }
   } else if (activePlayer === 'server2') {
     const isAnime = movie?.genres?.includes('Animation');
-    const isTV = movie?.type === 'TV Series' || movie?.type === 'TV';
     if (isAnime && isTV) {
       if (audioMode === 'sub' && movie?.mal_id) {
         currentUrl = `https://vidsrc.cc/v2/embed/tv/${movie.mal_id}/${currentSeason}/${currentEpisode}`;
@@ -157,7 +164,6 @@ const MovieDetail = () => {
 
   const downloadUrl = movie?.download_override_url ? movie.download_override_url.trim() : '';
   const hasDownload = !!downloadUrl;
-  const isMovie = !(movie?.type === 'TV Series' || movie?.type === 'TV');
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
@@ -225,12 +231,16 @@ const MovieDetail = () => {
                 )}
               </div>
 
-              {/* Season & Episode Selector for Anime TV Series */}
-              {activePlayer === 'server2' && (movie?.type === 'TV Series' || movie?.type === 'TV') && movie?.genres?.includes('Animation') && (
+              {/* Season & Episode Selector */}
+              {((activePlayer === 'server1' && isTV) || (activePlayer === 'server2' && isTV && movie?.genres?.includes('Animation'))) && (
                 <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-wrap items-center justify-between gap-6 shadow-xl">
                   <div className="flex flex-col">
-                    <span className="text-xs font-black text-brand-accent uppercase tracking-widest">Anime Streaming Settings</span>
-                    <span className="text-[10px] text-brand-text/40 font-bold uppercase mt-1">Japanese Audio + Eng Sub</span>
+                    <span className="text-xs font-black text-brand-accent uppercase tracking-widest">
+                      {activePlayer === 'server1' ? 'TV Series Settings' : 'Anime Streaming Settings'}
+                    </span>
+                    <span className="text-[10px] text-brand-text/40 font-bold uppercase mt-1">
+                      {activePlayer === 'server1' ? 'Select Season & Episode' : 'Japanese Audio + Eng Sub'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-3">
@@ -301,7 +311,7 @@ const MovieDetail = () => {
                 </button>
               </div>
                 {/* Sub/Dub Toggle for Anime */}
-                {movie?.genres?.includes('Animation') && (movie?.type === 'TV Series' || movie?.type === 'TV') && (
+                {movie?.genres?.includes('Animation') && isTV && (
                   <div className="flex items-center gap-2 mt-4">
                     <span className="text-xs font-black text-brand-text/40 uppercase">Audio Mode:</span>
                     <button
