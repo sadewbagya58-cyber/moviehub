@@ -13,6 +13,7 @@ const Admin = () => {
     videoUrl: '',
     altVideoUrl: '',
     imdb_id: '',
+    tmdb_id: '',
     mal_id: '',
     sub_url: '',
     type: 'Movie',
@@ -85,6 +86,7 @@ const Admin = () => {
       videoUrl: item.videoUrl || '',
       altVideoUrl: item.altVideoUrl || '',
       imdb_id: item.imdb_id || '',
+      tmdb_id: item.tmdb_id || '',
       mal_id: item.mal_id || '',
       sub_url: item.sub_url || '',
       type: item.type || 'Movie',
@@ -108,7 +110,7 @@ const Admin = () => {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', mal_id: '', sub_url: '', type: 'Movie', download_override_url: '' });
+    setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', tmdb_id: '', mal_id: '', sub_url: '', type: 'Movie', download_override_url: '' });
     setGenres(['']);
     setSubtitles([]);
     setSubInput({ label: '', url: '' });
@@ -119,12 +121,50 @@ const Admin = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      let seasons_data = null;
+      let extraImdbId = '';
+
+      const isTV = formData.type === 'TV Series' || formData.type === 'TV';
+      if (isTV && formData.tmdb_id) {
+        try {
+          const tmdbId = formData.tmdb_id.trim();
+          const response = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=456bcfcf858f276686a6042cb3a650d3&append_to_response=external_ids`);
+          if (response.ok) {
+            const data = await response.json();
+            
+            // Build seasons_data: mapping season_number to episode_count
+            if (data.seasons && Array.isArray(data.seasons)) {
+              seasons_data = {};
+              data.seasons.forEach((season) => {
+                if (season.season_number > 0) {
+                  seasons_data[season.season_number] = season.episode_count;
+                }
+              });
+            }
+
+            // Extract IMDb ID if fetched via external_ids
+            if (data.external_ids && data.external_ids.imdb_id) {
+              extraImdbId = data.external_ids.imdb_id;
+            }
+          } else {
+            console.error("Failed to fetch TMDB data, status:", response.status);
+          }
+        } catch (tmdbError) {
+          console.error("Error fetching TMDB data:", tmdbError);
+        }
+      }
+
       const payload = {
         ...formData,
+        imdb_id: formData.imdb_id.trim() || extraImdbId || '',
         genres: genres.filter(g => g !== ''),
         subtitles: subtitles,
         sub_url: subtitles.length > 0 ? subtitles[0].url : formData.sub_url,
       };
+
+      if (seasons_data) {
+        payload.seasons_data = seasons_data;
+      }
 
       if (editingId) {
         await updateDoc(doc(db, 'movies', editingId), payload);
@@ -220,6 +260,10 @@ const Admin = () => {
                 <div className="space-y-2">
                   <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">IMDB ID (Player 3)</label>
                   <input name="imdb_id" value={formData.imdb_id} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="tt2527336" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">TMDB ID (TV Series Auto-Sync)</label>
+                  <input name="tmdb_id" value={formData.tmdb_id || ''} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10" placeholder="e.g. 1399" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">MyAnimeList (MAL) ID</label>

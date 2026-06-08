@@ -134,6 +134,24 @@ const MovieDetail = () => {
   const isMovie = !isTV;
   const typePrefix = isTV ? 'tv' : 'movie';
   const imdbId = movie?.imdb_id?.trim();
+
+  // Dynamic Season & Episode count logic based on seasons_data map or local fallback
+  const seasonsData = movie?.seasons_data || {};
+  let seasonsList = [];
+  if (Object.keys(seasonsData).length > 0) {
+    seasonsList = Object.keys(seasonsData).map(Number).sort((a, b) => a - b);
+  } else if (movie?.totalSeasons) {
+    seasonsList = Array.from({ length: parseInt(movie.totalSeasons) || 1 }, (_, i) => i + 1);
+  } else {
+    seasonsList = [1, 2, 3, 4, 5];
+  }
+
+  let totalEpisodes = 24;
+  if (seasonsData[currentSeason]) {
+    totalEpisodes = seasonsData[currentSeason];
+  } else if (movie?.episodesPerSeason) {
+    totalEpisodes = parseInt(movie.episodesPerSeason) || 24;
+  }
   
   let currentUrl = '';
   if (activePlayer === 'server1') {
@@ -249,7 +267,7 @@ const MovieDetail = () => {
                     <div className="flex items-center gap-3 overflow-x-auto scrollbar-none py-1">
                       <span className="text-xs font-black text-white/40 uppercase tracking-widest shrink-0">Seasons</span>
                       <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5].map((seasonNum) => (
+                        {seasonsList.map((seasonNum) => (
                           <button
                             key={seasonNum}
                             type="button"
@@ -280,7 +298,7 @@ const MovieDetail = () => {
                     </div>
                     
                     <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-3 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
-                      {Array.from({ length: 24 }, (_, i) => i + 1).map((epNum) => (
+                      {Array.from({ length: totalEpisodes }, (_, i) => i + 1).map((epNum) => (
                         <button
                           key={epNum}
                           type="button"
