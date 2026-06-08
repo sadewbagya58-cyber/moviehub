@@ -233,55 +233,68 @@ const MovieDetail = () => {
 
               {/* Season & Episode Selector */}
               {((activePlayer === 'server1' && isTV) || (activePlayer === 'server2' && isTV && movie?.genres?.includes('Animation'))) && (
-                <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-wrap items-center justify-between gap-6 shadow-xl">
-                  <div className="flex flex-col">
-                    <span className="text-xs font-black text-brand-accent uppercase tracking-widest">
-                      {activePlayer === 'server1' ? 'TV Series Settings' : 'Anime Streaming Settings'}
-                    </span>
-                    <span className="text-[10px] text-brand-text/40 font-bold uppercase mt-1">
-                      {activePlayer === 'server1' ? 'Select Season & Episode' : 'Japanese Audio + Eng Sub'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-white/60">Season</span>
-                      <div className="flex items-center bg-white/5 border border-white/10 rounded-lg overflow-hidden">
-                        <button 
-                          type="button"
-                          onClick={() => setCurrentSeason(prev => Math.max(1, prev - 1))}
-                          className="px-3 py-1.5 hover:bg-white/10 text-white font-bold transition-all cursor-pointer"
-                        >
-                          -
-                        </button>
-                        <span className="px-4 font-black text-brand-accent min-w-[24px] text-center">{currentSeason}</span>
-                        <button 
-                          type="button"
-                          onClick={() => setCurrentSeason(prev => prev + 1)}
-                          className="px-3 py-1.5 hover:bg-white/10 text-white font-bold transition-all cursor-pointer"
-                        >
-                          +
-                        </button>
+                <div className="bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-[2rem] p-6 md:p-8 flex flex-col gap-6 md:gap-8 shadow-2xl">
+                  {/* Header / Info & Season Selector Row */}
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-white/5 pb-6">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-black text-brand-accent uppercase tracking-widest">
+                        {activePlayer === 'server1' ? 'TV Series Settings' : 'Anime Streaming Settings'}
+                      </span>
+                      <span className="text-[10px] text-brand-text/40 font-bold uppercase mt-1">
+                        {activePlayer === 'server1' ? 'Select Season & Episode' : 'Japanese Audio + Eng Sub'}
+                      </span>
+                    </div>
+                    
+                    {/* Season Selector - Premium Horizontal Tabs */}
+                    <div className="flex items-center gap-3 overflow-x-auto scrollbar-none py-1">
+                      <span className="text-xs font-black text-white/40 uppercase tracking-widest shrink-0">Seasons</span>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((seasonNum) => (
+                          <button
+                            key={seasonNum}
+                            type="button"
+                            onClick={() => {
+                              setCurrentSeason(seasonNum);
+                              setCurrentEpisode(1); // Reset episode when season changes
+                            }}
+                            className={`px-4 py-2 rounded-xl text-xs font-black tracking-wider transition-all duration-300 border ${
+                              currentSeason === seasonNum
+                                ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_15px_rgba(0,242,255,0.25)]'
+                                : 'bg-white/5 border-white/5 text-brand-text/60 hover:text-white hover:border-white/20'
+                            }`}
+                          >
+                            S{seasonNum}
+                          </button>
+                        ))}
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-white/60">Episode</span>
-                      <div className="flex items-center bg-white/5 border border-white/10 rounded-lg overflow-hidden">
-                        <button 
+                  </div>
+
+                  {/* Episode Grid */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Episodes</span>
+                      <span className="text-[10px] text-brand-accent font-bold uppercase tracking-wider">
+                        Season {currentSeason} • Episode {currentEpisode}
+                      </span>
+                    </div>
+                    
+                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-3 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
+                      {Array.from({ length: 24 }, (_, i) => i + 1).map((epNum) => (
+                        <button
+                          key={epNum}
                           type="button"
-                          onClick={() => setCurrentEpisode(prev => Math.max(1, prev - 1))}
-                          className="px-3 py-1.5 hover:bg-white/10 text-white font-bold transition-all cursor-pointer"
+                          onClick={() => setCurrentEpisode(epNum)}
+                          className={`aspect-square flex flex-col items-center justify-center rounded-xl transition-all duration-300 border font-black text-xs cursor-pointer ${
+                            currentEpisode === epNum
+                              ? 'bg-gradient-to-br from-brand-accent/20 to-purple-500/20 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.4)] scale-105'
+                              : 'bg-white/5 border-white/5 text-brand-text/60 hover:text-white hover:border-white/20 hover:scale-[1.02]'
+                          }`}
                         >
-                          -
+                          <span className="text-[9px] opacity-40 uppercase tracking-widest font-bold">EP</span>
+                          <span className="text-sm mt-0.5">{epNum}</span>
                         </button>
-                        <span className="px-4 font-black text-brand-accent min-w-[32px] text-center">{currentEpisode}</span>
-                        <button 
-                          type="button"
-                          onClick={() => setCurrentEpisode(prev => prev + 1)}
-                          className="px-3 py-1.5 hover:bg-white/10 text-white font-bold transition-all cursor-pointer"
-                        >
-                          +
-                        </button>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </div>
