@@ -128,7 +128,18 @@ const Admin = () => {
       if (isTV && formData.tmdb_id) {
         try {
           const tmdbId = formData.tmdb_id.trim();
-          const response = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=456bcfcf858f276686a6042cb3a650d3&append_to_response=external_ids`);
+          const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY || 'b821ad1cf197f7ed4fcf324e49138c0c';
+          const TMDB_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN || 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiODIxYWQxY2YxOTdmN2VkNGZjZjMyNGU0OTEzOGMwYyIsIm5iZiI6MTc4MDg5MDIxMC43Miwic3ViIjoiNmEyNjNhNjJhMDk4M2NmNjg3NWFlNGE4Iiwic2NvcGVzIjpbImFwaV9yZWFkIl0sInZlcnNpb24iOjF9.yPorSq3Gj9Gq3M1MUxvfumF1R3KfM9RnMUsxw0JxNtM';
+          
+          const response = await fetch(
+            `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_KEY}&append_to_response=external_ids`,
+            {
+              headers: {
+                accept: 'application/json',
+                Authorization: `Bearer ${TMDB_TOKEN}`
+              }
+            }
+          );
           if (response.ok) {
             const data = await response.json();
             

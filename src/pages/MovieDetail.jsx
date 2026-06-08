@@ -23,7 +23,8 @@ const MovieDetail = () => {
   const videoRef = useRef(null);
   const plyrRef = useRef(null);
 
-  const TMDB_KEY = '456bcfcf858f276686a6042cb3a650d3';
+  const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY || 'b821ad1cf197f7ed4fcf324e49138c0c';
+  const TMDB_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN || 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiODIxYWQxY2YxOTdmN2VkNGZjZjMyNGU0OTEzOGMwYyIsIm5iZiI6MTc4MDg5MDIxMC43Miwic3ViIjoiNmEyNjNhNjJhMDk4M2NmNjg3NWFlNGE4Iiwic2NvcGVzIjpbImFwaV9yZWFkIl0sInZlcnNpb24iOjF9.yPorSq3Gj9Gq3M1MUxvfumF1R3KfM9RnMUsxw0JxNtM';
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -83,10 +84,17 @@ const MovieDetail = () => {
     const fetchSeasons = async () => {
       setTmdbLoading(true);
       try {
-        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_KEY}`);
-        if (res.ok) {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_KEY}`, {
+          headers: {
+            accept: 'application/json',
+            Authorization: `Bearer ${TMDB_TOKEN}`
+          }
+        });
+        if (res.status === 200) {
           const data = await res.json();
-          const validSeasons = data.seasons.filter(s => s.season_number > 0);
+          const response = { data };
+          console.log("TMDB Success Data:", response.data);
+          const validSeasons = response.data.seasons.filter(s => s.season_number > 0);
           const list = validSeasons.map(s => s.season_number);
           setSeasonsList(list);
         } else {
@@ -126,10 +134,17 @@ const MovieDetail = () => {
 
     const fetchEpisodes = async () => {
       try {
-        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${currentSeason}?api_key=${TMDB_KEY}`);
-        if (res.ok) {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${currentSeason}?api_key=${TMDB_KEY}`, {
+          headers: {
+            accept: 'application/json',
+            Authorization: `Bearer ${TMDB_TOKEN}`
+          }
+        });
+        if (res.status === 200) {
           const data = await res.json();
-          const actualEpisodeCount = data.episodes ? data.episodes.length : 12;
+          const response = { data };
+          console.log("TMDB Success Data:", response.data);
+          const actualEpisodeCount = response.data.episodes ? response.data.episodes.length : 12;
           setTotalEpisodes(actualEpisodeCount);
         } else {
           const error = new Error(`Failed to fetch episodes (Status: ${res.status})`);
