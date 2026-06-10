@@ -12,6 +12,7 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activePlayer, setActivePlayer] = useState('server1');
+  const [activeServer, setActiveServer] = useState('server1');
   const [audioMode, setAudioMode] = useState('sub');
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSeason, setCurrentSeason] = useState(1);
@@ -268,6 +269,16 @@ const MovieDetail = () => {
     }
   }
 
+  if (activeServer === 'server2') {
+    if (imdbId) {
+      if (isTV) {
+        currentUrl = `https://vidlink.pro/tv/${imdbId}/${currentSeason}/${currentEpisode}?sub=${movie.subtitle_url || ''}`;
+      } else {
+        currentUrl = `https://vidlink.pro/movie/${imdbId}?sub=${movie.subtitle_url || ''}`;
+      }
+    }
+  }
+
   const downloadUrl = movie?.download_override_url ? movie.download_override_url.trim() : '';
   const hasDownload = !!downloadUrl;
 
@@ -298,6 +309,32 @@ const MovieDetail = () => {
           <div className="space-y-10">
             {/* 16:9 Video Player Container and Controls */}
             <div className="flex flex-col gap-6 md:gap-8 w-full">
+              {/* Sleek Glassmorphic Server Toggle */}
+              <div className="flex items-center gap-2 bg-slate-900/60 border border-white/10 rounded-2xl p-1 self-center md:self-start backdrop-blur-xl shadow-2xl">
+                <button
+                  type="button"
+                  onClick={() => setActiveServer('server1')}
+                  className={`px-5 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 cursor-pointer border ${
+                    activeServer === 'server1'
+                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.5)] border-purple-500/30 scale-105'
+                      : 'bg-transparent border-transparent text-brand-text/60 hover:text-white hover:scale-102'
+                  }`}
+                >
+                  Server 1 (VidSrc)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveServer('server2')}
+                  className={`px-5 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 cursor-pointer border ${
+                    activeServer === 'server2'
+                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.5)] border-purple-500/30 scale-105'
+                      : 'bg-transparent border-transparent text-brand-text/60 hover:text-white hover:scale-102'
+                  }`}
+                >
+                  Server 2 (VidLink HD)
+                </button>
+              </div>
+
               {/* Outer 16:9 box — #000 bg hides any white edge lines */}
               <div
                 className="relative w-full rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group"

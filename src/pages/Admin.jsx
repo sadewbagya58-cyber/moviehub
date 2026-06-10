@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, storage } from '../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Plus, Minus, Send, CheckCircle2, Film, Edit, Trash2 } from 'lucide-react';
 
 const Admin = () => {
@@ -16,6 +17,7 @@ const Admin = () => {
     tmdb_id: '',
     mal_id: '',
     sub_url: '',
+    subtitle_url: '',
     type: 'Movie',
     download_override_url: '',
   });
@@ -27,6 +29,7 @@ const Admin = () => {
   const [success, setSuccess] = useState(false);
   const [catalog, setCatalog] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [subFile, setSubFile] = useState(null);
 
   useEffect(() => {
     const q = query(collection(db, 'movies'), orderBy('createdAt', 'desc'));
@@ -89,12 +92,14 @@ const Admin = () => {
       tmdb_id: item.tmdb_id || '',
       mal_id: item.mal_id || '',
       sub_url: item.sub_url || '',
+      subtitle_url: item.subtitle_url || '',
       type: item.type || 'Movie',
       download_override_url: item.download_override_url || '',
     });
     setGenres(item.genres && item.genres.length > 0 ? item.genres : ['']);
     setSubtitles(item.subtitles || []);
     setSubInput({ label: '', url: '' });
+    setSubFile(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -110,10 +115,11 @@ const Admin = () => {
   };
 
   const resetForm = () => {
-    setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', tmdb_id: '', mal_id: '', sub_url: '', type: 'Movie', download_override_url: '' });
+    setFormData({ title: '', year: '', rating: '', synopsis: '', poster: '', videoUrl: '', altVideoUrl: '', imdb_id: '', tmdb_id: '', mal_id: '', sub_url: '', subtitle_url: '', type: 'Movie', download_override_url: '' });
     setGenres(['']);
     setSubtitles([]);
     setSubInput({ label: '', url: '' });
+    setSubFile(null);
     setEditingId(null);
   };
 
@@ -123,6 +129,13 @@ const Admin = () => {
     try {
       let seasons_data = null;
       let extraImdbId = '';
+      let subtitle_url = formData.subtitle_url || '';
+
+      if (subFile) {
+        const fileRef = ref(storage, `subtitles/${Date.now()}_${subFile.name}`);
+        const uploadResult = await uploadBytes(fileRef, subFile);
+        subtitle_url = await getDownloadURL(uploadResult.ref);
+      }
 
       const isTV = formData.type === 'TV Series' || formData.type === 'TV';
       if (isTV && formData.tmdb_id) {
@@ -167,6 +180,7 @@ const Admin = () => {
 
       const payload = {
         ...formData,
+        subtitle_url: subtitle_url,
         imdb_id: formData.imdb_id.trim() || extraImdbId || '',
         genres: genres.filter(g => g !== ''),
         subtitles: subtitles,
@@ -325,6 +339,37 @@ const Admin = () => {
                       + Add
                     </button>
                   </div>
+                </div>
+              </div>
+
+              {/* Custom Subtitle Upload */}
+              <div className="border-t border-white/5 pt-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-black text-brand-text/40 uppercase tracking-widest">Upload Custom Subtitle (.srt, .vtt)</h3>
+                </div>
+                <div className="space-y-3">
+                  <input
+                    type="file"
+                    accept=".srt,.vtt"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setSubFile(e.target.files[0]);
+                      } else {
+                        setSubFile(null);
+                      }
+                    }}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:uppercase file:bg-brand-accent/20 file:text-brand-accent hover:file:bg-brand-accent/30 file:cursor-pointer"
+                  />
+                  {formData.subtitle_url && (
+                    <p className="text-xs text-brand-accent font-bold">
+                      Current Subtitle URL: <a href={formData.subtitle_url} target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition-colors">{formData.subtitle_url}</a>
+                    </p>
+                  )}
+                  {subFile && (
+                    <p className="text-xs text-brand-text/60">
+                      Selected File: <span className="text-white font-bold">{subFile.name}</span> ({(subFile.size / 1024).toFixed(1)} KB)
+                    </p>
+                  )}
                 </div>
               </div>
               
