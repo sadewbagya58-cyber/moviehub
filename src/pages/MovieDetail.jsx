@@ -540,8 +540,8 @@ const MovieDetail = () => {
 
                   <div className="flex items-start gap-2 text-brand-text/60 max-w-xl">
                     <Info size={18} className="text-brand-accent shrink-0 mt-0.5" />
-                    <p className="text-sm font-medium leading-relaxed">
-                      Download the appropriate subtitle file, then click the CC/Settings icon in the player and select <span className="text-white font-bold">"Upload/Custom Subtitle"</span> to load it.
+                    <p className="text-[13px] font-medium leading-relaxed">
+                      💡 උපදෙස්: මුලින්ම සබ්ටයිටල් ෆයිල් එක Download කරගන්න. ඉන්පසු ෆෝන් එකේ File Manager එකෙන් ඒක Extract (Unzip) කරගන්න. දැන් ප්ලේයර් එකේ පහළ තියෙන Settings (⚙️) අයිකන් එක ඔබන්න. එතකොට එන මෙනු එකෙන් 'Subtitle' තෝරලා, ඉන්පසු 'Upload' ඔබන්න. ඊට පස්සේ අර Extract කරපු ෆයිල් ලොකේෂන් එකට ගිහින් ෆයිල් එක සිලෙක්ට් කරගන්න.
                     </p>
                   </div>
                 </div>
