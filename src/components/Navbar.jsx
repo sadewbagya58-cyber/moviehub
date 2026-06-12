@@ -8,6 +8,12 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const currentQuery = searchParams.get('q') || '';
+  const [searchTerm, setSearchTerm] = useState(currentQuery);
+
+  // Sync search input if URL changes (e.g. going back/forward)
+  useEffect(() => {
+    setSearchTerm(currentQuery);
+  }, [currentQuery]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,15 +25,15 @@ const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Movies', href: '/?type=Movie' },
-    { name: 'TV Series', href: '/?type=TV' },
-    { name: 'Trending', href: '/?sort=trending' },
+    { name: 'Movies', href: '/category/latest-movies' },
+    { name: 'TV Series', href: '/category/trending-tv' },
+    { name: 'Trending', href: '/category/trending' },
   ];
 
-  const handleSearch = (e) => {
-    const term = e.target.value;
-    if (term) {
-      navigate(`/?q=${encodeURIComponent(term)}`);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
     } else {
       navigate('/');
     }
@@ -59,16 +65,18 @@ const Navbar = () => {
 
           {/* Right Section: Search & Mobile Menu */}
           <div className="flex items-center space-x-4">
-            <div className="hidden sm:flex relative items-center">
+            <form onSubmit={handleSubmit} className="hidden sm:flex relative items-center">
               <input
                 type="text"
-                value={currentQuery}
-                onChange={handleSearch}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search movies, cast, genres..."
                 className="bg-brand-card/50 border border-white/10 rounded-full py-1.5 pl-4 pr-10 text-sm focus:outline-none focus:border-brand-accent/50 w-48 lg:w-64 transition-all duration-300 focus:w-72 text-brand-text"
               />
-              <Search className="absolute right-3 w-4 h-4 text-brand-text/50" />
-            </div>
+              <button type="submit" className="absolute right-3 focus:outline-none text-brand-text/50 hover:text-brand-accent transition-colors">
+                <Search className="w-4 h-4" />
+              </button>
+            </form>
 
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center">
@@ -87,16 +95,18 @@ const Navbar = () => {
       <div className={`md:hidden absolute top-full left-0 right-0 transition-all duration-300 ease-in-out border-b border-white/10 shadow-2xl ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
         <div className="px-4 py-6 space-y-4 bg-brand-bg/98">
           <div className="mb-6">
-            <div className="relative flex items-center">
+            <form onSubmit={(e) => { handleSubmit(e); setIsOpen(false); }} className="relative flex items-center">
               <input
                 type="text"
-                value={currentQuery}
-                onChange={(e) => { handleSearch(e); setIsOpen(false); }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search movies, cast, genres..."
                 className="bg-brand-card/50 border border-white/10 rounded-full py-3 pl-5 pr-12 text-sm focus:outline-none focus:border-brand-accent/50 w-full text-brand-text shadow-inner"
               />
-              <Search className="absolute right-4 w-5 h-5 text-brand-accent/70" />
-            </div>
+              <button type="submit" className="absolute right-4 focus:outline-none text-brand-accent/70 hover:text-brand-accent transition-colors">
+                <Search className="w-5 h-5" />
+              </button>
+            </form>
           </div>
           <div className="flex flex-col space-y-2">
             {navLinks.map((link) => (

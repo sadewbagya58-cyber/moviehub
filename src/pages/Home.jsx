@@ -66,6 +66,9 @@ const Home = () => {
   const latestMovies = movies.filter((m) => m.type === 'Movie');
   const tvSeries = movies.filter((m) => m.type === 'TV Series');
   const anime = movies.filter((m) => (m.genres ?? []).includes('Animation'));
+  const trendingMovies = [...movies]
+    .sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0))
+    .slice(0, 5);
 
   const renderSection = (title, emoji, items, viewAllLink = '/') => (
     <section className="mb-12">
@@ -84,8 +87,8 @@ const Home = () => {
 
   return (
     <>
-      {/* Hero – show first movie when no search */}
-      {!searchQuery && movies.length > 0 && <Hero movie={movies[0]} />}
+      {/* Hero – show trending movies when no search */}
+      {!searchQuery && trendingMovies.length > 0 && <Hero movies={trendingMovies} />}
       {/* Search or loading states */}
       <section className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${searchQuery ? 'pt-32 pb-16 min-h-[60vh]' : 'py-16'}`}>
         <div className="flex items-center justify-between mb-10">
@@ -99,7 +102,7 @@ const Home = () => {
             )}
           </h2>
           <div className="h-px flex-grow mx-8 bg-gradient-to-r from-brand-accent/30 to-transparent hidden md:block" />
-          <Link to="/" className="text-brand-accent text-sm font-bold hover:underline">
+          <Link to="/category/trending" className="text-brand-accent text-sm font-bold hover:underline">
             View All
           </Link>
         </div>
@@ -124,11 +127,11 @@ const Home = () => {
           )
         ) : (
           <>
-            {renderSection('Latest Movies', '🎬', latestMovies)}
+            {renderSection('Latest Movies', '🎬', latestMovies, '/category/latest-movies')}
             <hr className="my-8 border-brand-accent/30" />
-            {renderSection('Trending TV Series', '📺', tvSeries)}
+            {renderSection('Trending TV Series', '📺', tvSeries, '/category/trending-tv')}
             <hr className="my-8 border-brand-accent/30" />
-            {renderSection('Epic Anime Collections', '🔥', anime)}
+            {renderSection('Epic Anime Collections', '🔥', anime, '/category/anime')}
           </>
         )}
       </section>

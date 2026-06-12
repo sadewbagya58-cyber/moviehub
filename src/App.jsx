@@ -3,6 +3,8 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import MovieDetail from './pages/MovieDetail';
 import Admin from './pages/Admin';
+import SearchResults from './pages/SearchResults';
+import CategoryView from './pages/CategoryView';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
             <Route path="/movie/:id" element={<MovieDetail />} />
             <Route path="/tv/:id" element={<MovieDetail />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/category/:categoryName" element={<CategoryView />} />
           </Routes>
         </main>
         
