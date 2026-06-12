@@ -309,82 +309,64 @@ const MovieDetail = () => {
           <div className="space-y-10">
             {/* 16:9 Video Player Container and Controls */}
             <div className="flex flex-col gap-6 md:gap-8 w-full">
-              {/* Sleek Glassmorphic Server Toggle */}
-              <div className="flex items-center gap-2 bg-slate-900/60 border border-white/10 rounded-2xl p-1 self-center md:self-start backdrop-blur-xl shadow-2xl">
-                <button
-                  type="button"
-                  onClick={() => setActiveServer('server1')}
-                  className={`px-5 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 cursor-pointer border ${
-                    activeServer === 'server1'
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.5)] border-purple-500/30 scale-105'
-                      : 'bg-transparent border-transparent text-brand-text/60 hover:text-white hover:scale-102'
-                  }`}
-                >
-                  Server 1 (VidSrc)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveServer('server2')}
-                  className={`px-5 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 cursor-pointer border ${
-                    activeServer === 'server2'
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.5)] border-purple-500/30 scale-105'
-                      : 'bg-transparent border-transparent text-brand-text/60 hover:text-white hover:scale-102'
-                  }`}
-                >
-                  Server 2 (VidLink HD)
-                </button>
-              </div>
+              {/* Premium Title Above Player */}
+              <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text tracking-wide text-center">
+                {movie.title || movie.name}
+              </h2>
 
-              {/* Outer 16:9 box — #000 bg hides any white edge lines */}
-              <div
-                className="relative w-full rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group"
-                style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', height: 0, overflow: 'hidden', backgroundColor: '#000' }}
-              >
-                {!isPlaying ? (
-                  <div 
-                    className="absolute inset-0 cursor-pointer flex items-center justify-center bg-black z-20"
-                    onClick={() => setIsPlaying(true)}
-                  >
-                    <img src={movie.poster} alt={movie.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-300" />
-                    <div className="absolute w-20 h-20 bg-brand-accent/90 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(0,242,255,0.5)] group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-10 h-10 text-brand-bg translate-x-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+              {/* Glassmorphic Player Container */}
+              <div className="rounded-2xl p-1.5 bg-slate-950/40 backdrop-blur-md border border-gray-800/50 shadow-[0_0_30px_rgba(139,92,246,0.15)] overflow-hidden">
+                {/* Outer 16:9 box — #000 bg hides any white edge lines */}
+                <div
+                  className="relative w-full rounded-2xl overflow-hidden group"
+                  style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', height: 0, overflow: 'hidden', backgroundColor: '#000' }}
+                >
+                  {!isPlaying ? (
+                    <div 
+                      className="absolute inset-0 cursor-pointer flex items-center justify-center bg-black z-20"
+                      onClick={() => setIsPlaying(true)}
+                    >
+                      <img src={movie.poster} alt={movie.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-300" />
+                      <div className="absolute w-20 h-20 bg-brand-accent/90 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(0,242,255,0.5)] group-hover:scale-110 transition-transform duration-300">
+                        <svg className="w-10 h-10 text-brand-bg translate-x-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                      </div>
                     </div>
-                  </div>
-                ) : currentUrl ? (
-                  <div
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
-                  >
-                      <iframe
-                        src={currentUrl}
-                        style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0 }}
-                        allowFullScreen={true}
-                        allow="autoplay; encrypted-media"
-                        title={movie.title}
-                        referrerPolicy="origin"
-                        key={currentUrl}
-                      />
-                  </div>
-                ) : (
-                  <div
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}
-                    className="text-brand-text/30 font-bold uppercase tracking-widest text-center px-4"
-                  >
-                    IMDB ID unavailable for this movie
-                  </div>
-                )}
+                  ) : currentUrl ? (
+                    <div
+                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
+                    >
+                        <iframe
+                          src={currentUrl}
+                          style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0 }}
+                          allowFullScreen={true}
+                          allow="autoplay; encrypted-media"
+                          title={movie.title}
+                          referrerPolicy="origin"
+                          key={currentUrl}
+                        />
+                    </div>
+                  ) : (
+                    <div
+                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}
+                      className="text-brand-text/30 font-bold uppercase tracking-widest text-center px-4"
+                    >
+                      IMDB ID unavailable for this movie
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Season & Episode Selector */}
-              {((activePlayer === 'server1' && isTV) || (activePlayer === 'server2' && isTV && movie?.genres?.includes('Animation'))) && (
+              {isTV && (
                 <div className="bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-[2rem] p-6 md:p-8 flex flex-col gap-6 md:gap-8 shadow-2xl">
                   {/* Header / Info & Season Selector Row */}
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-white/5 pb-6">
                     <div className="flex flex-col">
                       <span className="text-xs font-black text-brand-accent uppercase tracking-widest">
-                        {activePlayer === 'server1' ? 'TV Series Settings' : 'Anime Streaming Settings'}
+                        {activeServer === 'server1' ? 'TV Series Settings' : 'HD Player Settings'}
                       </span>
                       <span className="text-[10px] text-brand-text/40 font-bold uppercase mt-1">
-                        {activePlayer === 'server1' ? 'Select Season & Episode' : 'Japanese Audio + Eng Sub'}
+                        Select Season & Episode
                       </span>
                     </div>
                     
@@ -458,21 +440,23 @@ const MovieDetail = () => {
               {/* Player Selection Tabs */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                 <button
-                  onClick={() => { setActivePlayer('server1'); setIsPlaying(false); }}
-                  className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
-                    activePlayer === 'server1'
-                      ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
-                      : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
+                  type="button"
+                  onClick={() => { setActiveServer('server1'); setIsPlaying(false); }}
+                  className={`px-6 py-3 rounded-full font-black tracking-widest uppercase transition-all duration-300 border ${
+                    activeServer === 'server1'
+                      ? 'border-cyan-500 bg-purple-500/20 text-white shadow-[0_0_15px_rgba(6,182,212,0.3)]'
+                      : 'border-gray-700 bg-black/40 text-gray-400 hover:text-white hover:border-gray-500'
                   }`}
                 >
                   Server 1
                 </button>
                 <button
-                  onClick={() => { setActivePlayer('server2'); setIsPlaying(false); }}
-                  className={`px-6 py-3 rounded-xl font-black tracking-widest uppercase transition-all duration-300 border-2 ${
-                    activePlayer === 'server2'
-                      ? 'bg-brand-accent/10 border-brand-accent text-brand-accent shadow-[0_0_20px_rgba(0,242,255,0.3)]'
-                      : 'bg-white/5 border-white/10 text-brand-text/60 hover:text-white hover:border-white/30'
+                  type="button"
+                  onClick={() => { setActiveServer('server2'); setIsPlaying(false); }}
+                  className={`px-6 py-3 rounded-full font-black tracking-widest uppercase transition-all duration-300 border ${
+                    activeServer === 'server2'
+                      ? 'border-cyan-500 bg-purple-500/20 text-white shadow-[0_0_15px_rgba(6,182,212,0.3)]'
+                      : 'border-gray-700 bg-black/40 text-gray-400 hover:text-white hover:border-gray-500'
                   }`}
                 >
                   Server 2
