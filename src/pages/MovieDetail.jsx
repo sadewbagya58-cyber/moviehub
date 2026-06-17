@@ -21,6 +21,7 @@ const MovieDetail = () => {
   const [seasonsList, setSeasonsList] = useState([]);
   const [totalEpisodes, setTotalEpisodes] = useState(12);
   const [tmdbLoading, setTmdbLoading] = useState(false);
+  const [currentEpisodeName, setCurrentEpisodeName] = useState('');
   const videoRef = useRef(null);
   const plyrRef = useRef(null);
 
@@ -160,6 +161,33 @@ const MovieDetail = () => {
     fetchEpisodes();
   }, [movie, currentSeason]);
 
+  // TMDB: Fetch episode name whenever season or episode changes
+  useEffect(() => {
+    if (!movie) return;
+    const isTV = movie?.type?.toLowerCase() === 'tv series' || movie?.type?.toLowerCase() === 'tv';
+    if (!isTV) return;
+    const tmdbId = movie?.tmdb_id ? String(movie.tmdb_id).trim() : '';
+    if (!tmdbId) { setCurrentEpisodeName(''); return; }
+
+    const fetchEpisodeName = async () => {
+      try {
+        const res = await fetch(
+          `https://api.themoviedb.org/3/tv/${tmdbId}/season/${currentSeason}/episode/${currentEpisode}?api_key=${TMDB_KEY}`,
+          { headers: { accept: 'application/json', Authorization: `Bearer ${TMDB_TOKEN}` } }
+        );
+        if (res.status === 200) {
+          const data = await res.json();
+          setCurrentEpisodeName(data.name || '');
+        } else {
+          setCurrentEpisodeName('');
+        }
+      } catch {
+        setCurrentEpisodeName('');
+      }
+    };
+    fetchEpisodeName();
+  }, [movie, currentSeason, currentEpisode]);
+
   // Detect if URL needs iframe (Google Drive, YouTube, StreamWish, etc.)
   const isEmbedSource = (url) => {
     if (!url) return false;
@@ -280,19 +308,10 @@ const MovieDetail = () => {
 
   if (activeServer === 'server2') {
     if (imdbId) {
-      if (movie.subtitle_url) {
-        const encodedSub = encodeURIComponent(movie.subtitle_url);
-        if (isTV) {
-          currentUrl = `https://multiembed.mov/?video_id=${imdbId}&s=${currentSeason}&e=${currentEpisode}&sub=${encodedSub}`;
-        } else {
-          currentUrl = `https://multiembed.mov/?video_id=${imdbId}&sub=${encodedSub}`;
-        }
+      if (isTV) {
+        currentUrl = `https://multiembed.mov/?video_id=${imdbId}&s=${currentSeason}&e=${currentEpisode}`;
       } else {
-        if (isTV) {
-          currentUrl = `https://multiembed.mov/?video_id=${imdbId}&s=${currentSeason}&e=${currentEpisode}`;
-        } else {
-          currentUrl = `https://multiembed.mov/?video_id=${imdbId}`;
-        }
+        currentUrl = `https://multiembed.mov/?video_id=${imdbId}`;
       }
     }
   }
@@ -328,9 +347,19 @@ const MovieDetail = () => {
             {/* 16:9 Video Player Container and Controls */}
             <div className="flex flex-col gap-6 md:gap-8 w-full">
               {/* Premium Title Above Player */}
-              <h2 className="text-2xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text tracking-wide text-center">
-                {movie.title || movie.name}
-              </h2>
+              <div className="text-center mb-4 space-y-1">
+                <h2 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text tracking-wide">
+                  {movie.title || movie.name}
+                </h2>
+                {isTV && (
+                  <p className="text-sm md:text-base font-semibold text-brand-text/50 tracking-wide">
+                    Season {currentSeason} &bull; Episode {currentEpisode}
+                    {currentEpisodeName && (
+                      <span className="text-brand-text/80 font-bold"> &mdash; {currentEpisodeName}</span>
+                    )}
+                  </p>
+                )}
+              </div>
 
               {/* Glassmorphic Player Container */}
               <div className="rounded-2xl p-1.5 bg-slate-950/40 backdrop-blur-md border border-gray-800/50 shadow-[0_0_30px_rgba(139,92,246,0.15)] overflow-hidden">
