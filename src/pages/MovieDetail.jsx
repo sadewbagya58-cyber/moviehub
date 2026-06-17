@@ -280,10 +280,19 @@ const MovieDetail = () => {
 
   if (activeServer === 'server2') {
     if (imdbId) {
-      if (isTV) {
-        currentUrl = `https://vidlink.pro/tv/${imdbId}/${currentSeason}/${currentEpisode}?sub=${movie.subtitle_url || ''}`;
+      if (movie.subtitle_url) {
+        const encodedSub = encodeURIComponent(movie.subtitle_url);
+        if (isTV) {
+          currentUrl = `https://multiembed.mov/?video_id=${imdbId}&s=${currentSeason}&e=${currentEpisode}&sub=${encodedSub}`;
+        } else {
+          currentUrl = `https://multiembed.mov/?video_id=${imdbId}&sub=${encodedSub}`;
+        }
       } else {
-        currentUrl = `https://vidlink.pro/movie/${imdbId}?sub=${movie.subtitle_url || ''}`;
+        if (isTV) {
+          currentUrl = `https://multiembed.mov/?video_id=${imdbId}&s=${currentSeason}&e=${currentEpisode}`;
+        } else {
+          currentUrl = `https://multiembed.mov/?video_id=${imdbId}`;
+        }
       }
     }
   }
@@ -507,7 +516,7 @@ const MovieDetail = () => {
                 )}
 
                {/* Subtitle Toolbox */}
-              {((movie.subtitles && movie.subtitles.length > 0) || movie.sub_url) && (
+              {activeServer !== 'server2' && ((movie.subtitles && movie.subtitles.length > 0) || movie.sub_url) && (
                 <div className="bg-slate-900 md:bg-slate-900/50 md:backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-[2rem] p-6 md:p-8 space-y-6">
                   <div className="flex items-center gap-3">
                     <FileText className="text-brand-accent" size={24} />
