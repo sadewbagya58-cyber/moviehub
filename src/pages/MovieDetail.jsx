@@ -245,10 +245,19 @@ const MovieDetail = () => {
   let currentUrl = '';
   if (activePlayer === 'server1') {
     if (imdbId) {
-      if (isTV) {
-        currentUrl = `https://vsembed.ru/embed/tv/${imdbId}/${currentSeason || 1}/${currentEpisode || 1}`;
+      if (movie.subtitle_url) {
+        const encodedSub = encodeURIComponent(movie.subtitle_url);
+        if (isTV) {
+          currentUrl = `https://vidsrc.xyz/embed/tv/${imdbId}/${currentSeason || 1}/${currentEpisode || 1}?sub.file=${encodedSub}&sub.label=Sinhala&sub.default=1`;
+        } else {
+          currentUrl = `https://vidsrc.xyz/embed/movie/${imdbId}?sub.file=${encodedSub}&sub.label=Sinhala&sub.default=1`;
+        }
       } else {
-        currentUrl = `https://vsembed.ru/embed/movie/${imdbId}`;
+        if (isTV) {
+          currentUrl = `https://vsembed.ru/embed/tv/${imdbId}/${currentSeason || 1}/${currentEpisode || 1}`;
+        } else {
+          currentUrl = `https://vsembed.ru/embed/movie/${imdbId}`;
+        }
       }
     }
   } else if (activePlayer === 'server2') {
