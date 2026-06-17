@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, addDoc, serverTimestamp, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Plus, Minus, Send, CheckCircle2, Film, Edit, Trash2 } from 'lucide-react';
 
@@ -28,6 +28,49 @@ const Admin = () => {
   const [success, setSuccess] = useState(false);
   const [catalog, setCatalog] = useState([]);
   const [editingId, setEditingId] = useState(null);
+
+  const [globalAlert, setGlobalAlert] = useState('');
+  const [savingAlert, setSavingAlert] = useState(false);
+
+  const fallbackAlertText = "💡 පහළ Subtitle Toolbox එකේ උපසිරසි දාගන්නා විදිහ ගැන උපදෙස් දී ඇති අතර, එහි කියා ඇති පරිදි උපසිරසි දාගන්න. එමෙන්ම, ප්ලේයර් එක Touch කරද්දී හෝ උපසිරසි දාන්න යද්දී වෙනත් වෙබ් පිටුවක් (Ads) Load වුවහොත්, එයින් Back වී නැවත පැමිණෙන්න.";
+
+  useEffect(() => {
+    const fetchGlobalAlert = async () => {
+      try {
+        const docRef = doc(db, 'settings', 'announcement');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data()?.text) {
+          setGlobalAlert(docSnap.data().text);
+        } else {
+          setGlobalAlert(fallbackAlertText);
+        }
+      } catch (error) {
+        console.error("Error fetching global alert in admin:", error);
+        setGlobalAlert(fallbackAlertText);
+      }
+    };
+    fetchGlobalAlert();
+  }, []);
+
+  const handleSaveAlert = async () => {
+    setSavingAlert(true);
+    try {
+      const docRef = doc(db, 'settings', 'announcement');
+      await setDoc(docRef, { text: globalAlert }, { merge: true });
+      alert("Global alert note saved successfully!");
+    } catch (error) {
+      console.error("Error saving global alert:", error);
+      alert("Failed to save global alert note.");
+    } finally {
+      setSavingAlert(false);
+    }
+  };
+
+  const handleResetAlert = () => {
+    if (window.confirm("Reset alert text to the default Sinhala instruction note?")) {
+      setGlobalAlert(fallbackAlertText);
+    }
+  };
 
   useEffect(() => {
     const q = query(collection(db, 'movies'), orderBy('createdAt', 'desc'));
@@ -389,6 +432,47 @@ const Admin = () => {
             </button>
           </div>
         </form>
+
+        {/* Global Alert Note Management */}
+        <div className="mt-12 bg-brand-card/20 backdrop-blur-xl border border-white/5 p-8 rounded-[2rem] space-y-6">
+          <h2 className="text-xl font-black text-white uppercase tracking-wider">Global Alert Note Management</h2>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs font-black text-brand-text/40 uppercase tracking-widest">Global Alert Text</label>
+              <textarea 
+                value={globalAlert} 
+                onChange={(e) => setGlobalAlert(e.target.value)} 
+                rows={4} 
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent outline-none transition-all resize-none placeholder:text-white/10" 
+                placeholder="Enter global alert text..." 
+              />
+            </div>
+            
+            <div className="flex gap-4">
+              <button 
+                type="button" 
+                onClick={handleSaveAlert} 
+                disabled={savingAlert}
+                className="bg-brand-accent text-brand-bg px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-white hover:scale-105 transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {savingAlert ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-brand-bg"></div>
+                ) : (
+                  'Save Alert Note'
+                )}
+              </button>
+              
+              <button 
+                type="button" 
+                onClick={handleResetAlert}
+                className="bg-white/5 border border-white/10 text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-white/10 hover:scale-105 transition-all cursor-pointer"
+              >
+                Reset to Default
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* Catalog List section */}
         <div className="mt-16 bg-brand-card/20 backdrop-blur-xl border border-white/5 p-8 rounded-[2rem] space-y-6">

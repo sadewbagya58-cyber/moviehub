@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Star, ArrowLeft, Download, ExternalLink, FileText, Info } from 'lucide-react';
+import { Star, ArrowLeft, Download, ExternalLink, FileText, Info, X } from 'lucide-react';
 import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
 
@@ -22,6 +22,8 @@ const MovieDetail = () => {
   const [totalEpisodes, setTotalEpisodes] = useState(12);
   const [tmdbLoading, setTmdbLoading] = useState(false);
   const [currentEpisodeName, setCurrentEpisodeName] = useState('');
+  const [alertNote, setAlertNote] = useState('');
+  const [showAlert, setShowAlert] = useState(true);
   const videoRef = useRef(null);
   const plyrRef = useRef(null);
 
@@ -188,6 +190,29 @@ const MovieDetail = () => {
     fetchEpisodeName();
   }, [movie, currentSeason, currentEpisode]);
 
+  // Fetch the Global Alert Note from Firestore settings/announcement
+  useEffect(() => {
+    const fetchAlertNote = async () => {
+      try {
+        const docRef = doc(db, 'settings', 'announcement');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data()?.text) {
+          setAlertNote(docSnap.data().text);
+        } else {
+          setAlertNote(
+            "💡 පහළ Subtitle Toolbox එකේ උපසිරසි දාගන්නා විදිහ ගැන උපදෙස් දී ඇති අතර, එහි කියා ඇති පරිදි උපසිරසි දාගන්න. එමෙන්ම, ප්ලේයර් එක Touch කරද්දී හෝ උපසිරසි දාන්න යද්දී වෙනත් වෙබ් පිටුවක් (Ads) Load වුවහොත්, එයින් Back වී නැවත පැමිණෙන්න."
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching global alert note:", error);
+        setAlertNote(
+          "💡 පහළ Subtitle Toolbox එකේ උපසිරසි දාගන්නා විදිහ ගැන උපදෙස් දී ඇති අතර, එහි කියා ඇති පරිදි උපසිරසි දාගන්න. එමෙන්ම, ප්ලේයර් එක Touch කරද්දී හෝ උපසිරසි දාන්න යද්දී වෙනත් වෙබ් පිටුවක් (Ads) Load වුවහොත්, එයින් Back වී නැවත පැමිණෙන්න."
+        );
+      }
+    };
+    fetchAlertNote();
+  }, []);
+
   // Detect if URL needs iframe (Google Drive, YouTube, StreamWish, etc.)
   const isEmbedSource = (url) => {
     if (!url) return false;
@@ -342,6 +367,25 @@ const MovieDetail = () => {
         </Link>
 
         <div className="max-w-5xl mx-auto w-full">
+          {showAlert && alertNote && (
+            <div className="relative mb-8 p-5 rounded-2xl bg-slate-950/60 backdrop-blur-md border border-gray-800/80 hover:border-gray-700/80 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.5)] group/alert">
+              <button
+                type="button"
+                onClick={() => setShowAlert(false)}
+                className="absolute top-4 right-4 p-1.5 rounded-full text-brand-text/40 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                aria-label="Dismiss Alert"
+              >
+                <X size={18} />
+              </button>
+              <div className="flex items-start gap-3.5 pr-8">
+                <span className="text-brand-accent shrink-0 mt-0.5 text-lg">💡</span>
+                <p className="text-sm md:text-base font-semibold leading-relaxed text-brand-text/90">
+                  {alertNote}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Video Player Section */}
           <div className="space-y-10">
             {/* 16:9 Video Player Container and Controls */}
