@@ -409,7 +409,7 @@ const MovieDetail = () => {
               <div className="rounded-2xl p-1.5 bg-slate-950/40 backdrop-blur-md border border-gray-800/50 shadow-[0_0_30px_rgba(139,92,246,0.15)] overflow-hidden">
                 {/* Outer 16:9 box — #000 bg hides any white edge lines */}
                 <div
-                  className="relative w-full aspect-video h-[220px] sm:h-[350px] md:h-[480px] lg:h-[550px] rounded-2xl overflow-hidden group bg-black"
+                  className="relative w-full aspect-video h-[260px] sm:h-[370px] md:h-[500px] lg:h-[580px] xl:h-[640px] rounded-2xl overflow-hidden group bg-black"
                 >
                   {!isPlaying ? (
                     <div 
@@ -428,7 +428,7 @@ const MovieDetail = () => {
                         <iframe
                           src={currentUrl}
                           className="w-full h-full"
-                          style={{ position: 'absolute', top: '-2px', left: '-2px', width: 'calc(100% + 4px)', height: 'calc(100% + 4px)', border: 0 }}
+                          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
                           width="100%"
                           height="100%"
                           allowFullScreen={true}
