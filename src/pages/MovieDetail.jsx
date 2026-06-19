@@ -407,12 +407,10 @@ const MovieDetail = () => {
 
               {/* Glassmorphic Player Container */}
               <div className="rounded-2xl p-1.5 bg-slate-950/40 backdrop-blur-md border border-gray-800/50 shadow-[0_0_30px_rgba(139,92,246,0.15)] overflow-hidden">
-                {/* Outer 16:9 box — #000 bg hides any white edge lines */}
-                <div
-                  className="relative w-full aspect-video h-[260px] sm:h-[370px] md:h-[500px] lg:h-[580px] xl:h-[640px] rounded-2xl overflow-hidden group bg-black"
-                >
+                {/* Fluid 16:9 wrapper using the padding-bottom trick — fully non-clipping */}
+                <div className="relative w-full pb-[56.25%] h-0 bg-black rounded-2xl overflow-hidden group">
                   {!isPlaying ? (
-                    <div 
+                    <div
                       className="absolute inset-0 cursor-pointer flex items-center justify-center bg-black z-20"
                       onClick={() => setIsPlaying(true)}
                     >
@@ -422,26 +420,21 @@ const MovieDetail = () => {
                       </div>
                     </div>
                   ) : currentUrl ? (
-                    <div
-                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', backgroundColor: '#000' }}
-                    >
-                        <iframe
-                          src={currentUrl}
-                          className="w-full h-full"
-                          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
-                          width="100%"
-                          height="100%"
-                          allowFullScreen={true}
-                          allow="autoplay; encrypted-media"
-                          title={movie.title}
-                          referrerPolicy="origin"
-                          key={currentUrl}
-                        />
-                    </div>
+                    <iframe
+                      src={currentUrl}
+                      className="absolute inset-0 w-full h-full"
+                      style={{ border: 0 }}
+                      width="100%"
+                      height="100%"
+                      allowFullScreen={true}
+                      allow="autoplay; encrypted-media"
+                      title={movie.title}
+                      referrerPolicy="origin"
+                      key={currentUrl}
+                    />
                   ) : (
                     <div
-                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#000' }}
-                      className="text-brand-text/30 font-bold uppercase tracking-widest text-center px-4"
+                      className="absolute inset-0 flex items-center justify-center bg-black text-brand-text/30 font-bold uppercase tracking-widest text-center px-4"
                     >
                       IMDB ID unavailable for this movie
                     </div>
