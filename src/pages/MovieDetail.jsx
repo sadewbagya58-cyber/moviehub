@@ -407,8 +407,20 @@ const MovieDetail = () => {
 
               {/* Glassmorphic Player Container */}
               <div className="rounded-2xl p-1.5 bg-slate-950/40 backdrop-blur-md border border-gray-800/50 shadow-[0_0_30px_rgba(139,92,246,0.15)] overflow-hidden">
-                {/* Fluid 16:9 wrapper using the padding-bottom trick — fully non-clipping */}
-                <div className="relative w-full pb-[56.25%] h-0 bg-black rounded-2xl overflow-hidden group">
+                {/* 
+                  Fluid 16:9 padding-bottom trick.
+                  VidSrc (Server 1) uses object-fit:cover internally which causes its own
+                  control bar to be clipped by our overflow:hidden boundary.
+                  Fix: extra bottom padding on the outer shell for Server 1 only, giving
+                  the player's control bar room to breathe without affecting Server 2.
+                */}
+                <div
+                  className="relative w-full bg-black rounded-2xl overflow-hidden group"
+                  style={{
+                    paddingBottom: activeServer === 'server1' ? 'calc(56.25% + 44px)' : '56.25%',
+                    height: 0,
+                  }}
+                >
                   {!isPlaying ? (
                     <div
                       className="absolute inset-0 cursor-pointer flex items-center justify-center bg-black z-20"
@@ -422,10 +434,11 @@ const MovieDetail = () => {
                   ) : currentUrl ? (
                     <iframe
                       src={currentUrl}
-                      className="absolute inset-0 w-full h-full"
-                      style={{ border: 0 }}
+                      className="absolute inset-0 w-full h-full max-w-full max-h-full"
+                      style={{ border: 0, overflow: 'hidden' }}
                       width="100%"
                       height="100%"
+                      scrolling="no"
                       allowFullScreen={true}
                       allow="autoplay; encrypted-media"
                       title={movie.title}
