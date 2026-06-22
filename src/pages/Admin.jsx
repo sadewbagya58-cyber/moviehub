@@ -24,6 +24,8 @@ const Admin = () => {
   const [genres, setGenres] = useState(['']);
   const [subtitles, setSubtitles] = useState([]);
   const [subInput, setSubInput] = useState({ label: '', url: '' });
+  const [episodeDownloads, setEpisodeDownloads] = useState({});
+  const [epDownloadInput, setEpDownloadInput] = useState({ season: '1', episode: '1', url: '' });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [catalog, setCatalog] = useState([]);
@@ -140,6 +142,8 @@ const Admin = () => {
     setGenres(item.genres && item.genres.length > 0 ? item.genres : ['']);
     setSubtitles(item.subtitles || []);
     setSubInput({ label: '', url: '' });
+    setEpisodeDownloads(item.episode_downloads || {});
+    setEpDownloadInput({ season: '1', episode: '1', url: '' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -159,6 +163,8 @@ const Admin = () => {
     setGenres(['']);
     setSubtitles([]);
     setSubInput({ label: '', url: '' });
+    setEpisodeDownloads({});
+    setEpDownloadInput({ season: '1', episode: '1', url: '' });
     setEditingId(null);
   };
 
@@ -217,6 +223,7 @@ const Admin = () => {
         genres: genres.filter(g => g !== ''),
         subtitles: subtitles,
         sub_url: subtitles.length > 0 ? subtitles[0].url : formData.sub_url,
+        episode_downloads: isTV ? episodeDownloads : {},
       };
 
       if (seasons_data) {
@@ -391,6 +398,115 @@ const Admin = () => {
               <p className="text-[10px] text-brand-text/30 font-bold tracking-wider uppercase">Server 1: Auto-generated (Vidsrc.me) | Server 2: Auto-generated (Vidsrc.to / CC for Anime) | Subtitles: Multiple SRTs/ZIPs</p>
             </div>
           </div>
+
+          {/* Episode Download Links (TV Series only) */}
+          {formData.type === 'TV Series' && (
+            <div className="bg-brand-card/20 backdrop-blur-xl border border-white/5 p-8 rounded-[2rem] space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-black text-white uppercase tracking-wider">Episode Download Links</h2>
+                <span className="text-[10px] text-brand-text/30 font-bold uppercase tracking-wider">
+                  {Object.keys(episodeDownloads).length} Links Added
+                </span>
+              </div>
+
+              {/* Temporary Episode Downloads List Review */}
+              {Object.keys(episodeDownloads).length > 0 && (
+                <div className="grid sm:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                  {Object.entries(episodeDownloads)
+                    .sort((a, b) => {
+                      const matchA = a[0].match(/S(\d+)E(\d+)/);
+                      const matchB = b[0].match(/S(\d+)E(\d+)/);
+                      if (matchA && matchB) {
+                        const [, sA, eA] = matchA.map(Number);
+                        const [, sB, eB] = matchB.map(Number);
+                        if (sA !== sB) return sA - sB;
+                        return eA - eB;
+                      }
+                      return a[0].localeCompare(b[0]);
+                    })
+                    .map(([key, url]) => (
+                      <div key={key} className="flex items-center justify-between p-3 bg-white/5 border border-white/5 rounded-xl text-sm">
+                        <div className="truncate max-w-[240px] flex flex-col">
+                          <span className="font-black text-brand-accent uppercase text-[10px]">
+                            {key.replace('S', 'Season ').replace('E', ' • Episode ')}
+                          </span>
+                          <span className="text-white/60 text-xs truncate">{url}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newDownloads = { ...episodeDownloads };
+                            delete newDownloads[key];
+                            setEpisodeDownloads(newDownloads);
+                          }}
+                          className="text-white/20 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                        >
+                          <Minus size={16} />
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {/* Episode Download Link Form Inputs */}
+              <div className="grid sm:grid-cols-12 gap-3 items-end">
+                <div className="sm:col-span-3 space-y-2">
+                  <label className="text-[10px] font-black text-brand-text/30 uppercase tracking-widest">Season</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={epDownloadInput.season}
+                    onChange={(e) => setEpDownloadInput({ ...epDownloadInput, season: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-brand-accent outline-none transition-all"
+                    placeholder="e.g. 1"
+                  />
+                </div>
+                <div className="sm:col-span-3 space-y-2">
+                  <label className="text-[10px] font-black text-brand-text/30 uppercase tracking-widest">Episode</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={epDownloadInput.episode}
+                    onChange={(e) => setEpDownloadInput({ ...epDownloadInput, episode: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-brand-accent outline-none transition-all"
+                    placeholder="e.g. 1"
+                  />
+                </div>
+                <div className="sm:col-span-4 space-y-2">
+                  <label className="text-[10px] font-black text-brand-text/30 uppercase tracking-widest">Download URL</label>
+                  <input
+                    type="text"
+                    value={epDownloadInput.url}
+                    onChange={(e) => setEpDownloadInput({ ...epDownloadInput, url: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10"
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (epDownloadInput.season && epDownloadInput.episode && epDownloadInput.url.trim()) {
+                        const key = `S${epDownloadInput.season}E${epDownloadInput.episode}`;
+                        setEpisodeDownloads({
+                          ...episodeDownloads,
+                          [key]: epDownloadInput.url.trim()
+                        });
+                        setEpDownloadInput({
+                          ...epDownloadInput,
+                          episode: (parseInt(epDownloadInput.episode, 10) + 1).toString(),
+                          url: ''
+                        });
+                      }
+                    }}
+                    className="w-full bg-brand-accent/10 hover:bg-brand-accent text-brand-accent hover:text-brand-bg py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all border border-brand-accent/20 cursor-pointer"
+                  >
+                    + Add Link
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Dynamic Genres */}
           <div className="bg-brand-card/20 backdrop-blur-xl border border-white/5 p-8 rounded-[2rem] space-y-6">

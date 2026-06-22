@@ -342,7 +342,10 @@ const MovieDetail = () => {
   }
 
   const downloadUrl = movie?.download_override_url ? movie.download_override_url.trim() : '';
-  const hasDownload = !!downloadUrl;
+  const episodeDownloads = movie?.episode_downloads || {};
+  const episodeKey = `S${currentSeason}E${currentEpisode}`;
+  const episodeDownloadUrl = isTV ? (episodeDownloads[episodeKey] || downloadUrl) : downloadUrl;
+  const hasDownload = !!episodeDownloadUrl;
 
   return (
     <div className="relative min-h-screen pb-20 bg-brand-bg text-brand-text">
@@ -581,7 +584,7 @@ const MovieDetail = () => {
                 {/* Premium Download Button */}
                 {hasDownload ? (
                   <a
-                    href={downloadUrl}
+                    href={episodeDownloadUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full flex items-center justify-center gap-3 py-5 px-8 rounded-2xl font-black text-lg uppercase tracking-wider transition-all duration-300 border-2 border-brand-accent bg-gradient-to-r from-[#0a0d24] via-[#120d2b] to-[#0a0d24] shadow-[0_0_20px_rgba(0,242,255,0.2)] hover:shadow-[0_0_35px_rgba(0,242,255,0.45)] hover:scale-[1.01] active:scale-[0.99] text-white hover:from-[#00f2ff]/20 hover:via-[#8b5cf6]/20 hover:to-[#00f2ff]/20 hover:border-brand-accent cursor-pointer text-center"
