@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Plus, Minus, Send, CheckCircle2, Film, Edit, Trash2 } from 'lucide-react';
+import { Plus, Minus, Send, CheckCircle2, Film, Edit, Trash2, Lock, ShieldAlert, Search } from 'lucide-react';
 
 const Admin = () => {
   const [formData, setFormData] = useState({
@@ -30,6 +30,12 @@ const Admin = () => {
   const [success, setSuccess] = useState(false);
   const [catalog, setCatalog] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    localStorage.getItem('admin_authenticated') === 'true'
+  );
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [globalAlert, setGlobalAlert] = useState('');
   const [savingAlert, setSavingAlert] = useState(false);
@@ -100,6 +106,17 @@ const Admin = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (passwordInput === '20117485') {
+      localStorage.setItem('admin_authenticated', 'true');
+      setIsAuthenticated(true);
+      setAuthError('');
+    } else {
+      setAuthError('Incorrect Admin Password! Access Denied.');
+    }
   };
 
   const addGenre = () => setGenres([...genres, '']);
@@ -248,6 +265,65 @@ const Admin = () => {
       setLoading(false);
     }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-brand-bg px-4 py-32 relative overflow-hidden">
+        {/* Animated blurred circles for background aesthetics */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-accent/10 rounded-full blur-3xl -z-10 animate-pulse duration-[6000ms]"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl -z-10 animate-pulse duration-[8000ms]"></div>
+
+        <div className="max-w-md w-full bg-brand-card/20 backdrop-blur-xl border border-white/5 p-10 rounded-[2.5rem] shadow-2xl relative">
+          <div className="flex flex-col items-center text-center space-y-6">
+            <div className="w-20 h-20 bg-brand-accent/15 border border-brand-accent/20 rounded-2xl flex items-center justify-center text-brand-accent shadow-[0_0_30px_rgba(0,242,255,0.15)]">
+              <Lock size={36} className="animate-bounce duration-[3000ms]" />
+            </div>
+            
+            <div className="space-y-2">
+              <h1 className="text-3xl font-black text-white tracking-tighter uppercase">Admin Security</h1>
+              <p className="text-brand-text/40 font-bold uppercase tracking-widest text-xs">
+                Enter password to unlock dashboard
+              </p>
+            </div>
+
+            <form onSubmit={handleLogin} className="w-full space-y-6">
+              <div className="space-y-2 text-left">
+                <label className="text-[10px] font-black text-brand-text/40 uppercase tracking-widest block pl-1">
+                  Admin Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={passwordInput}
+                  onChange={(e) => setPasswordInput(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/10 text-center tracking-[0.3em] font-black text-lg"
+                  placeholder="••••••••"
+                />
+              </div>
+
+              {authError && (
+                <div className="flex items-center gap-2 text-xs font-black text-red-500 bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-xl uppercase tracking-wider justify-center">
+                  <ShieldAlert size={16} />
+                  {authError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full bg-brand-accent text-brand-bg py-4 rounded-xl font-black text-sm uppercase tracking-[0.25em] hover:bg-white hover:scale-[1.02] transition-all duration-300 shadow-[0_15px_30px_rgba(0,242,255,0.15)] active:scale-95 cursor-pointer"
+              >
+                Unlock Dashboard
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const filteredCatalog = catalog.filter((item) =>
+    item.title?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen pt-32 pb-20 bg-brand-bg px-4">
@@ -590,11 +666,26 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Catalog List section */}
         <div className="mt-16 bg-brand-card/20 backdrop-blur-xl border border-white/5 p-8 rounded-[2rem] space-y-6">
-          <div className="flex items-center justify-between border-b border-white/5 pb-4">
-            <h2 className="text-xl font-black text-white uppercase tracking-wider">Catalog Management</h2>
-            <span className="text-xs text-brand-text/40 font-bold uppercase tracking-widest">{catalog.length} items total</span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/5 pb-6 gap-4">
+            <div>
+              <h2 className="text-xl font-black text-white uppercase tracking-wider">Catalog Management</h2>
+              <p className="text-[10px] text-brand-text/40 font-bold uppercase tracking-widest mt-1">
+                {catalog.length} items total • {filteredCatalog.length} shown
+              </p>
+            </div>
+            
+            {/* Search Input Bar */}
+            <div className="relative w-full sm:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={16} />
+              <input
+                type="text"
+                placeholder="Search catalog by title..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-2.5 text-sm text-white focus:border-brand-accent outline-none transition-all placeholder:text-white/30"
+              />
+            </div>
           </div>
 
           <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
@@ -602,8 +693,12 @@ const Admin = () => {
               <div className="text-center py-10 text-brand-text/30 font-bold uppercase tracking-widest text-sm">
                 No items in database.
               </div>
+            ) : filteredCatalog.length === 0 ? (
+              <div className="text-center py-10 text-brand-text/30 font-bold uppercase tracking-widest text-sm">
+                No matching titles found.
+              </div>
             ) : (
-              catalog.map((item) => (
+              filteredCatalog.map((item) => (
                 <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white/5 hover:bg-white/[0.08] border border-white/5 hover:border-brand-accent/20 rounded-2xl transition-all duration-300 gap-4">
                   <div className="flex items-center gap-4 min-w-0">
                     <img src={item.poster || 'https://via.placeholder.com/150'} alt={item.title} className="w-16 h-20 object-cover rounded-lg border border-white/10 shrink-0" />
