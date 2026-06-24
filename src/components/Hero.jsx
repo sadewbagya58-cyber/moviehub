@@ -5,10 +5,25 @@ import { Link } from 'react-router-dom';
 const Hero = ({ movies = [] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Pick a random initial index when movies load
+  useEffect(() => {
+    if (movies && movies.length > 1) {
+      const randomIndex = Math.floor(Math.random() * movies.length);
+      setCurrentIndex(randomIndex);
+    }
+  }, [movies.length]);
+
+  // Autoplay with non-repeating random selection
   useEffect(() => {
     if (!movies || movies.length <= 1) return;
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % movies.length);
+      setCurrentIndex((prevIndex) => {
+        let newIndex = prevIndex;
+        while (newIndex === prevIndex) {
+          newIndex = Math.floor(Math.random() * movies.length);
+        }
+        return newIndex;
+      });
     }, 6000); // changes slide every 6 seconds
     return () => clearInterval(interval);
   }, [movies]);
